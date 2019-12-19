@@ -8,11 +8,19 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.shubhamr837.pdfoffice.MainActivity;
 import com.shubhamr837.pdfoffice.R;
 
-public class ImageAdapter extends BaseAdapter {
-private Context mContext;
+public class GridAdapter extends BaseAdapter {
+private static Context mContext;
+
+
+    public GridAdapter(Context context){
+        this.mContext = context;
+    }
+
     public Integer[] mThumbIds = {
             R.drawable.pdf_to_word, R.drawable.word_to_pdf,
             R.drawable.pdf_to_text,R.drawable.text_to_pdf
@@ -22,9 +30,7 @@ private Context mContext;
             R.string.pdf_to_text,R.string.text_to_pdf
     };
 
-    public ImageAdapter(Context context){
-    this.mContext = context;
-    }
+
 
     @Override
     public int getCount() {
@@ -53,10 +59,12 @@ private Context mContext;
 
             TextView textView = item_view.findViewById(R.id.operation_name);
             textView.setText(mStrings[position]);
+
         }
         else {
             item_view = convertView;
         }
         return item_view;
     }
+
 }
