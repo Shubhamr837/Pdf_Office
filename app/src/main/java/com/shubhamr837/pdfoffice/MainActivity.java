@@ -3,6 +3,8 @@ package com.shubhamr837.pdfoffice;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -21,6 +23,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.black)));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.black, this.getTheme()));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+        }
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(this));
         user = FirebaseAuth.getInstance().getCurrentUser();

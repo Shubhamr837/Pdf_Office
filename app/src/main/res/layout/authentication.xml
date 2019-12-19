@@ -24,7 +24,6 @@
 
         <ImageView
             android:id="@+id/googleIcon"
-            android:src="@drawable/image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
