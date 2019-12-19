@@ -84,5 +84,7 @@
     <string name="text_to_pdf">Text (.txt) to Pdf</string>
     <string name="pdf_to_image">Pdf to Image(.jpeg)</string>
     <string name="image_to_pdf">Image(.jpeg) to Pdf</string>
+    <string name="title_activity_pdf_files">PdfFiles</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

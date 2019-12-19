@@ -7,6 +7,7 @@
     android:background="@color/black"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
+        android:id="@+id/pdf_reader"
         android:background="#FFFFFF"
         android:orientation="horizontal"
         android:layout_width="match_parent"
