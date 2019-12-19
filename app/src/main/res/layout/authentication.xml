@@ -3,7 +3,7 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey_100"
+    android:background="@color/white"
     android:orientation="vertical"
     android:weightSum="4">
 
@@ -22,30 +22,24 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="82dp"
+            android:gravity="center"
+            android:fontFamily="sans-serif-light"
+            android:text="Sign in to continue"
+            android:textColor="@color/black"
+            android:textSize="30dp"></TextView>
+
         <ImageView
+            android:layout_gravity="center"
             android:id="@+id/googleIcon"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/title_bottom_margin"
-            android:text="@string/google_title_text"
-             />
+            android:padding="140dp"
+            android:src="@drawable/pdf" />
 
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/signed_out" />
 
-        <TextView
-            android:id="@+id/detail"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            tools:text="Firebase User ID: 123456789abc" />
 
     </LinearLayout>
 
@@ -61,7 +55,8 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:visibility="visible"
-            tools:visibility="gone" />
+            tools:visibility="gone"
+            />
 
         <LinearLayout
             android:id="@+id/signOutAndDisconnect"

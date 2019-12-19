@@ -82,5 +82,7 @@
     <string name="pdf_to_text">Pdf to Text (.txt)</string>
     <string name="word_to_pdf">Word (.doc) to Pdf</string>
     <string name="text_to_pdf">Text (.txt) to Pdf</string>
+    <string name="pdf_to_image">Pdf to Image(.jpeg)</string>
+    <string name="image_to_pdf">Image(.jpeg) to Pdf</string>
 
 </resources>

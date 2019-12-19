@@ -23,11 +23,13 @@ private static Context mContext;
 
     public Integer[] mThumbIds = {
             R.drawable.pdf_to_word, R.drawable.word_to_pdf,
-            R.drawable.pdf_to_text,R.drawable.text_to_pdf
+            R.drawable.pdf_to_text,R.drawable.text_to_pdf,
+            R.drawable.pdf_to_image,R.drawable.image_to_pdf
     };
     public Integer[] mStrings = {
             R.string.pdf_to_word,R.string.word_to_pdf,
-            R.string.pdf_to_text,R.string.text_to_pdf
+            R.string.pdf_to_text,R.string.text_to_pdf,
+            R.string.pdf_to_image,R.string.image_to_pdf
     };
 
 
@@ -54,16 +56,15 @@ private static Context mContext;
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if(convertView==null){
             item_view = inflater.inflate(R.layout.gridelementview,null);
-            ImageView imageView = item_view.findViewById(R.id.thumbnail);
-            imageView.setImageResource(mThumbIds[position]);
-
-            TextView textView = item_view.findViewById(R.id.operation_name);
-            textView.setText(mStrings[position]);
-
         }
         else {
             item_view = convertView;
         }
+        ImageView imageView = (ImageView) item_view.findViewById(R.id.thumbnail);
+        imageView.setImageResource(mThumbIds[position]);
+
+        TextView textView = (TextView) item_view.findViewById(R.id.operation_name);
+        textView.setText(mStrings[position]);
         return item_view;
     }
 
