@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1072349050717",
+    "firebase_url": "https://pdf-office-c3d21.firebaseio.com",
+    "project_id": "pdf-office-c3d21",
+    "storage_bucket": "pdf-office-c3d21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072349050717:android:a01b7b2500818d63801ab4",
+        "android_client_info": {
+          "package_name": "com.shubhamr837.pdfoffice"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1072349050717-aintl3sguc2ou405j45md0pa17vefkt4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0y-qxoPKfv8GHfgNhobrcGUU0OGPa5Rw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1072349050717-aintl3sguc2ou405j45md0pa17vefkt4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
