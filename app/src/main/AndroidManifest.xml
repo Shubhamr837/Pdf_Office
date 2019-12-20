@@ -4,8 +4,9 @@
     package="com.shubhamr837.pdfoffice">
 
     <dist:module dist:instant="true" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"></uses-permission>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -14,6 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activity.ImageSelectionActivity"
+            android:parentActivityName=".MainActivity"><meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.shubhamr837.pdfoffice.MainActivity" /></activity>
         <activity
             android:name=".activity.PdfFiles"
             android:label="@string/title_activity_pdf_files"
@@ -23,7 +28,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.shubhamr837.pdfoffice.MainActivity" />
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -14,24 +14,17 @@ import com.shubhamr837.pdfoffice.MainActivity;
 import com.shubhamr837.pdfoffice.R;
 
 public class GridAdapter extends BaseAdapter {
-private static Context mContext;
+    private static Context mContext;
 
 
-    public GridAdapter(Context context){
+    public Integer[] mThumbIds ;
+    public Integer[] mStrings ;
+
+    public GridAdapter(Context context,Integer[] mThumbIds,Integer[] mStrings){
         this.mContext = context;
+        this.mStrings=mStrings;
+        this.mThumbIds=mThumbIds;
     }
-
-    public Integer[] mThumbIds = {
-            R.drawable.pdf_to_word, R.drawable.word_to_pdf,
-            R.drawable.pdf_to_text,R.drawable.text_to_pdf,
-            R.drawable.pdf_to_image,R.drawable.image_to_pdf
-    };
-    public Integer[] mStrings = {
-            R.string.pdf_to_word,R.string.word_to_pdf,
-            R.string.pdf_to_text,R.string.text_to_pdf,
-            R.string.pdf_to_image,R.string.image_to_pdf
-    };
-
 
 
     @Override

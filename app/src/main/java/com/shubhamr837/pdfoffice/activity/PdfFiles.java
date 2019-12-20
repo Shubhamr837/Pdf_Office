@@ -14,11 +14,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
 
+import java.io.File;
+import java.util.Vector;
+
 public class PdfFiles extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
+    public Vector<File> files;
+    private Bundle bundle;
+    public String type;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +46,14 @@ public class PdfFiles extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new FilesListAdapter();
+
+        bundle = getIntent().getExtras();
+        files = (Vector<File>) getIntent().getParcelableExtra("files");
+        type = bundle.getString("type");
+
+        mAdapter = new FilesListAdapter(files,type);
         recyclerView.setAdapter(mAdapter);
+
     }
 
     }

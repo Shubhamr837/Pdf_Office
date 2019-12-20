@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.shubhamr837.pdfoffice.activity.ImageSelectionActivity;
 import com.shubhamr837.pdfoffice.activity.PdfFiles;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
 import com.shubhamr837.pdfoffice.activity.EmailPasswordActivity;
@@ -27,9 +28,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 {
     FirebaseUser user ;
     private static final int AUTHENTICATION_REQUEST_CODE = 1;
-    public Vector<File> pdf_files =new Vector<>() ;
+    public Vector<File> pdf_files = new Vector<>() ;
+    public Vector<File> doc_files = new Vector<>();
+    public Vector<File> txt_files = new Vector<>();
     boolean sorted=false;
-
+    public Integer[] mThumbIds = {
+            R.drawable.pdf_to_word, R.drawable.word_to_pdf,
+            R.drawable.pdf_to_text,R.drawable.text_to_pdf,
+            R.drawable.pdf_to_image,R.drawable.image_to_pdf
+    };
+    public Integer[] mStrings = {
+            R.string.pdf_to_word,R.string.word_to_pdf,
+            R.string.pdf_to_text,R.string.text_to_pdf,
+            R.string.pdf_to_image,R.string.image_to_pdf
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         findViewById(R.id.pdf_reader).setOnClickListener(this);
         GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new GridAdapter(this));
+        gridview.setAdapter(new GridAdapter(this,mThumbIds,mStrings));
         gridview.setOnItemClickListener(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
         if(user==null)
@@ -61,26 +73,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         else if (ff.isFile() && ff.getPath().endsWith(".pdf")) {
                             pdf_files.add(ff);
                         }
+                        else if (ff.isFile() && ff.getPath().endsWith(".doc")){
+                            doc_files.add(ff);
+                        }
+                        else if (ff.isFile() && ff.getPath().endsWith(".txt")){
+                            txt_files.add(ff);
+                        }
                     }
+
                 }
                 //bubble sort files by date
-                while(!sorted)
-                {   sorted=true;
-                    int j=0;
-                    while(j<pdf_files.size()-1){
-                        if(pdf_files.get(j).lastModified()<pdf_files.get(j+1).lastModified())
-                        {   sorted=false;
-                            Collections.swap(pdf_files,j,j+1);
-                        }
-                        j++;
-                    }
-                }
-
-
+                bubbleSort(pdf_files);
+                bubbleSort(doc_files);
+                bubbleSort(txt_files);
             }
         };
         scan_files.start();
 
+    }
+    public void bubbleSort(Vector<File> files){
+        while(!sorted)
+        {   sorted=true;
+            int j=0;
+            while(j<files.size()-1){
+                if(files.get(j).lastModified()<files.get(j+1).lastModified())
+                {   sorted=false;
+                    Collections.swap(files,j,j+1);
+                }
+                j++;
+            }
+        }
     }
     public void authenticate(){
         Intent authentication_intent = new Intent(this,EmailPasswordActivity.class);
@@ -108,16 +130,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id=v.getId();
         if(id==R.id.pdf_reader)
          {
-          Intent pdf_files = new Intent(this,PdfFiles.class);
-          startActivity(pdf_files);
+          Intent pdf_files_intent = new Intent(this,PdfFiles.class);
+          pdf_files_intent.putExtra("files",pdf_files);
+          pdf_files_intent.putExtra("type","pdf");
+          startActivity(pdf_files_intent);
          }
     }
     @Override
     public void onItemClick(AdapterView<?> a, View v, int position,long id)
     {
+        Intent intent;
 
         switch (position){
             case 0:
+
+            case 1:
+
+            case 2:
+
+            case 3:
+
+            case 4:
+
+            case 5:
+                intent= new Intent(this,ImageSelectionActivity.class);
+                startActivity(intent);
+
         }
     }
 
