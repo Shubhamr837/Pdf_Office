@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="@color/grey_300">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="98dp"
+    android:background="@color/white"
+    android:paddingBottom="2dp">
     <ImageView
         android:layout_gravity="center_vertical"
         android:padding="4dp"
@@ -17,4 +25,5 @@
     android:padding="4dp"
     android:id="@+id/file_name"
     android:textColor="@color/black"></TextView>
+</LinearLayout>
 </LinearLayout>

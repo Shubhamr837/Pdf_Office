@@ -15,10 +15,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.ImageSelectionActivity"
-            android:parentActivityName=".MainActivity"><meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.shubhamr837.pdfoffice.MainActivity" /></activity>
+        <activity android:name=".activity.PdfReadActivity"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.shubhamr837.pdfoffice.MainActivity" /></activity>
+        <activity
+            android:name=".activity.ImageSelectionActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.shubhamr837.pdfoffice.MainActivity" />
+        </activity>
         <activity
             android:name=".activity.FilesSelection"
             android:label="@string/title_activity_pdf_files"
@@ -28,7 +37,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.shubhamr837.pdfoffice.MainActivity" />
         </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

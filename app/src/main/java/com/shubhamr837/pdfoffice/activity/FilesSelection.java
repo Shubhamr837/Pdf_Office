@@ -65,6 +65,7 @@ public class FilesSelection extends AppCompatActivity {
         mAdapter = new FilesListAdapter(files,type);
         recyclerView.setAdapter(mAdapter);
 
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
