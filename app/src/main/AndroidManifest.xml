@@ -20,10 +20,10 @@
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.shubhamr837.pdfoffice.MainActivity" /></activity>
         <activity
-            android:name=".activity.PdfFiles"
+            android:name=".activity.FilesSelection"
             android:label="@string/title_activity_pdf_files"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.shubhamr837.pdfoffice.MainActivity" />
