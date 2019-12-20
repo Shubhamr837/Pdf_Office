@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,18 +24,20 @@ import java.util.Stack;
 import java.util.Vector;
 
 public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyViewHolder>  {
-   private int FILE_NAME_LENGTH = 50;
+    private int FILE_NAME_LENGTH = 50;
+    public static String pdf_intent;
     public static Vector<File> files;
     public String type ;
     public Vector<File> pdf_files = new Vector<>() ;
     public Vector<File> doc_files = new Vector<>();
     public Vector<File> txt_files = new Vector<>();
     boolean sorted=false;
-   public FilesListAdapter(Vector<File> files,String type){
-       System.out.println("inside the constructor");
+   public FilesListAdapter(String pdf_intent, String type, ProgressBar progressBar){
+       this.pdf_intent = pdf_intent;
        File f = Environment.getExternalStorageDirectory();
        Stack<File> stack = new Stack<File>();
        stack.push(f);
+       this.type=type;
        while(!stack.isEmpty()) {
            f = stack.pop();
            File[] file = f.listFiles();
@@ -65,7 +68,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
                          this.files=txt_files;
                          break;
        }
-
+       progressBar.setVisibility(View.INVISIBLE);
 
    }
 
@@ -89,9 +92,10 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
             Intent intent;
             String file_path =FilesListAdapter.files.get(getAdapterPosition()).getAbsolutePath();
 
-            if(file_path.endsWith(".pdf"))
+            if(type.equals("pdf"))
             {intent= new Intent(view.getContext(),PdfReadActivity.class);
             intent.putExtra("file_path",file_path);
+            intent.putExtra("intent",pdf_intent);
             view.getContext().startActivity(intent);}
         }
     }

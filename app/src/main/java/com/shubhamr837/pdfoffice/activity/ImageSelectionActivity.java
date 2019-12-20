@@ -20,12 +20,12 @@ public class ImageSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_selection);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Select Image");
-        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.black)));
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
         actionBar.setDisplayHomeAsUpEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.black, this.getTheme()));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.red, this.getTheme()));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.red));
         }
 
     }

@@ -1,8 +1,12 @@
 package com.shubhamr837.pdfoffice;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 {
     FirebaseUser user ;
     private static final int AUTHENTICATION_REQUEST_CODE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_FILES=1;
 
 
     public Integer[] mThumbIds = {
@@ -45,14 +50,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.black)));
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.black, this.getTheme()));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.red, this.getTheme()));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.red));
         }
         findViewById(R.id.pdf_reader).setOnClickListener(this);
         GridView gridview = (GridView) findViewById(R.id.gridview);
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+            } else {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_WRITE_FILES);
+
+            }
+        }
         gridview.setAdapter(new GridAdapter(this,mThumbIds,mStrings));
         gridview.setOnItemClickListener(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -91,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
           Intent pdf_files_intent = new Intent(this, FilesSelection.class);
           pdf_files_intent.putExtra("type","pdf");
           pdf_files_intent.putExtra("tittle","Open a file");
+          pdf_files_intent.putExtra("intent","read");
           startActivity(pdf_files_intent);
          }
     }
@@ -105,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                   intent.putExtra("type","pdf");
                   intent.putExtra("to","doc");
                   intent.putExtra("tittle","select a file");
+                  intent.putExtra("intent","Convert to Doc");
                   startActivity(intent);
                   break;
 
@@ -141,9 +164,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
         }
+
     }
+@Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_WRITE_FILES: {
 
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                } else {
+                  finish();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
 
 
 

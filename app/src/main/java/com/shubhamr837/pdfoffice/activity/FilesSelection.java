@@ -31,6 +31,7 @@ public class FilesSelection extends AppCompatActivity {
     public Vector<File> files;
     private Bundle bundle;
     public String type;
+    public String pdf_intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,17 +40,20 @@ public class FilesSelection extends AppCompatActivity {
 
 
         bundle = getIntent().getExtras();
+        if(bundle.containsKey("intent"))
+            pdf_intent = bundle.getString("intent");
+
         setContentView(R.layout.files_list_view);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar!=null)
-        { actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.black)));
+        { actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(bundle.getString("tittle"));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.black, this.getTheme()));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.red, this.getTheme()));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(getResources().getColor(R.color.black));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.red));
         }
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
@@ -62,7 +66,7 @@ public class FilesSelection extends AppCompatActivity {
         type = bundle.getString("type");
 
 
-        mAdapter = new FilesListAdapter(files,type);
+        mAdapter = new FilesListAdapter(pdf_intent,type,findViewById(R.id.progressBar));
         recyclerView.setAdapter(mAdapter);
 
 
