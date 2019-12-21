@@ -37,7 +37,7 @@ public class FilesSelection extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        while (MainActivity.scan_files.isAlive());
 
         bundle = getIntent().getExtras();
         if(bundle.containsKey("intent"))
@@ -66,7 +66,7 @@ public class FilesSelection extends AppCompatActivity {
         type = bundle.getString("type");
 
 
-        mAdapter = new FilesListAdapter(pdf_intent,type,findViewById(R.id.progressBar));
+        mAdapter = new FilesListAdapter(pdf_intent,type);
         recyclerView.setAdapter(mAdapter);
 
 

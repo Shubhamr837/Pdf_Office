@@ -28,47 +28,10 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
     public static String pdf_intent;
     public static Vector<File> files;
     public String type ;
-    public Vector<File> pdf_files = new Vector<>() ;
-    public Vector<File> doc_files = new Vector<>();
-    public Vector<File> txt_files = new Vector<>();
-    boolean sorted=false;
-   public FilesListAdapter(String pdf_intent, String type, ProgressBar progressBar){
-       this.pdf_intent = pdf_intent;
-       File f = Environment.getExternalStorageDirectory();
-       Stack<File> stack = new Stack<File>();
-       stack.push(f);
-       this.type=type;
-       while(!stack.isEmpty()) {
-           f = stack.pop();
-           File[] file = f.listFiles();
-           for (File ff : file) {
-               if (ff.isDirectory()) stack.push(ff);
-               else if (ff.isFile() && ff.getPath().endsWith(".pdf")) {
-                   pdf_files.add(ff);
 
-               }
-               else if (ff.isFile() &&( ff.getPath().endsWith(".doc")||ff.getPath().endsWith(".DOC"))){
-                   doc_files.add(ff);
-               }
-               else if (ff.isFile() && ff.getPath().endsWith(".txt")){
-                   txt_files.add(ff);
-               }
-           }
-       }
-       //bubble sort files by date
-       switch (type)
-       {
-           case "pdf":   bubbleSort(pdf_files);
-               this.files=pdf_files;
-                         break;
-           case "doc":   bubbleSort(doc_files);
-               this.files=doc_files;
-                         break;
-           case "txt":   bubbleSort(txt_files);
-                         this.files=txt_files;
-                         break;
-       }
-       progressBar.setVisibility(View.INVISIBLE);
+   public FilesListAdapter(String pdf_intent, String type){
+       this.pdf_intent = pdf_intent;
+       this.type=type;
 
    }
 
@@ -138,17 +101,5 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
     public int getItemCount() {
         return files.size();
     }
-    public void bubbleSort(Vector<File> files){
-        while(!sorted)
-        {   sorted=true;
-            int j=0;
-            while(j<files.size()-1){
-                if(files.get(j).lastModified()<files.get(j+1).lastModified())
-                {   sorted=false;
-                    Collections.swap(files,j,j+1);
-                }
-                j++;
-            }
-        }
-    }
+
 }
