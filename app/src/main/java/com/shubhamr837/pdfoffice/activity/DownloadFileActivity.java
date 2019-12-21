@@ -12,11 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
+import android.widget.TextView;
 
 import com.shubhamr837.pdfoffice.R;
 
 public class DownloadFileActivity extends AppCompatActivity {
 String type;
+public TextView file_name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,9 +33,10 @@ String type;
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.red));
         }
+        file_name=(TextView)findViewById(R.id.fileName);
         switch (type)
         {
-            case "pdf":
+            case "pdf":System.out.println("Recieved Pdf");
 
             case "doc":
 

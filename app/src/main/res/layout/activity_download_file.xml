@@ -23,19 +23,20 @@
         android:paddingTop="100dp"
         android:paddingBottom="50dp"></TextView>
 <ImageView
+    android:id="@+id/fileIcon"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:paddingTop="50dp"
    android:layout_marginBottom="50dp"
     android:layout_gravity="center"
-    android:src="@drawable/doc_icon"
+
 ></ImageView>
     <TextView
+        android:id="@+id/fileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="20dp"
-        android:text="File name aaaaaaa"
         ></TextView>
     </LinearLayout>
 

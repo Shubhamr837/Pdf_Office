@@ -16,10 +16,19 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
+import com.shubhamr837.pdfoffice.NetworkUtils;
 import com.shubhamr837.pdfoffice.R;
 
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static com.shubhamr837.pdfoffice.utils.Utils.isNetworkConnected;
 
@@ -29,10 +38,12 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
     private CustomDialogFragment customDialogFragment;
     public SeekBar seekBar;
     public TextView textView;
+    public File pdf_file;
+    public String pdf_intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String pdf_intent = getIntent().getExtras().getString("intent");
+        pdf_intent = getIntent().getExtras().getString("intent");
         if(pdf_intent.startsWith("Convert"))
         {setContentView(R.layout.activity_pdf_read_and_convert);
             ((Button)findViewById(R.id.convert_button)).setOnClickListener(this);
@@ -49,40 +60,44 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
             getWindow().setStatusBarColor(getResources().getColor(R.color.red));
         }
         pdfView = (PDFView) findViewById(R.id.pdfView);
-        File pdf_file = new File(getIntent().getExtras().getString("file_path"));
-        pdfView.fromFile(pdf_file).onLoad(this).enableSwipe(true)
+        pdf_file = new File(getIntent().getExtras().getString("file_path"));
+        pdfView.fromFile(pdf_file).enableSwipe(true)
                 .enableDoubletap(true)
-                .onPageScroll(this)
                 .defaultPage(0)
                 .enableAnnotationRendering(true)
-                .password(null).
-                scrollHandle(null)
+                .password(null)
+                .scrollHandle(null)
                 .enableAntialiasing(true)
-                .spacing(2)
+                .spacing(2).nightMode(true)
                 .swipeHorizontal(true).load();
-        seekBar = (SeekBar)findViewById(R.id.seekBar);
-        textView = (TextView)findViewById(R.id.textView);
-        seekBar.setProgress(pdfView.getCurrentPage());
+       if(!pdf_intent.startsWith("Convert")) {
+           
+            seekBar = (SeekBar) findViewById(R.id.seekBar);
+            textView = (TextView) findViewById(R.id.textView);
+            seekBar.setProgress(pdfView.getCurrentPage());
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int pval = 0;
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                pval = progress;
-                pdfView.jumpTo(progress);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                //write custom code to on start progress
-            }
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                textView.setText("Page "+pval + "/" + seekBar.getMax());
-            }
-        });
-        seekBar.setEnabled(true);
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                int pval = 0;
 
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    pval = progress;
+                    pdfView.jumpTo(progress);
+                }
 
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                    //write custom code to on start progress
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    textView.setText("Page " + pval + "/" + seekBar.getMax());
+                }
+            });
+            seekBar.setEnabled(true);
+
+        }
 
 
 
@@ -90,12 +105,17 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()){
             case R.id.convert_button :
                 if(isNetworkConnected(this))
-                {customDialogFragment = new CustomDialogFragment("Converting File","Please wait...",true);
+                {
+                customDialogFragment = new CustomDialogFragment("Converting File","Please wait...",true);
                 customDialogFragment.setCancelable(false);
                 customDialogFragment.show(getSupportFragmentManager(),"Convert File Fragment");
+                NetworkUtils networkUtils = new NetworkUtils(pdf_file,customDialogFragment,this);
+                Thread thread=new Thread(networkUtils);
+                thread.start();
 
                 }
                 else
@@ -113,4 +133,6 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
     public void loadComplete(int nbPages) {
         seekBar.setMax(nbPages-1);
     }
+
+
 }

@@ -21,7 +21,7 @@
             android:name=".activity.DownloadFileActivity"
             android:label="@string/title_activity_download_file"
             android:parentActivityName=".activity.PdfReadActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.shubhamr837.pdfoffice.activity.PdfReadActivity" />
