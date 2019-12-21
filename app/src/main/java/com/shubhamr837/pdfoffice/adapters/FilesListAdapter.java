@@ -1,14 +1,13 @@
 package com.shubhamr837.pdfoffice.adapters;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Environment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,8 +18,6 @@ import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.activity.PdfReadActivity;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Stack;
 import java.util.Vector;
 
 public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyViewHolder>  {

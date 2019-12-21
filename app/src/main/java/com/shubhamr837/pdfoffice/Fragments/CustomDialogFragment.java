@@ -39,9 +39,9 @@ public class CustomDialogFragment extends androidx.fragment.app.DialogFragment {
         ((TextView)view.findViewById(R.id.dialog_tittle)).setText(dialog_tittle);
         ((TextView)view.findViewById(R.id.dialog_text)).setText(dialog_text);
         if(dialog_button)
-            ((TextView)view.findViewById(R.id.download_button)).setVisibility(View.VISIBLE);
+            ((TextView)view.findViewById(R.id.cancel_action_button)).setVisibility(View.VISIBLE);
         else
-            ((TextView)view.findViewById(R.id.download_button)).setVisibility(View.INVISIBLE);
+            ((TextView)view.findViewById(R.id.cancel_action_button)).setVisibility(View.INVISIBLE);
     return view;
 }
 }

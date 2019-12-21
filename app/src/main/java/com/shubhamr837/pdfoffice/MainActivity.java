@@ -24,11 +24,14 @@ import com.shubhamr837.pdfoffice.activity.FilesSelection;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
 import com.shubhamr837.pdfoffice.activity.EmailPasswordActivity;
+import com.shubhamr837.pdfoffice.utils.Utils;
 
 import java.io.File;
 import java.util.Collections;
 import java.util.Stack;
 import java.util.Vector;
+
+import static com.shubhamr837.pdfoffice.utils.Utils.bubbleSort;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener , AdapterView.OnItemClickListener
 {
@@ -38,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public Vector<File> pdf_files = new Vector<>() ;
     public Vector<File> doc_files = new Vector<>();
     public Vector<File> txt_files = new Vector<>();
-    boolean sorted=false;
     public static Thread scan_files;
     CustomDialogFragment customDialogFragment;
 
@@ -96,16 +98,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         };
 
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS)
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(this,
+                Manifest.permission.INTERNET)
+                != PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_WIFI_STATE)
+                != PackageManager.PERMISSION_GRANTED&&ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_NETWORK_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
 
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    Manifest.permission.READ_CONTACTS)) {
+                    Manifest.permission.READ_EXTERNAL_STORAGE)&&ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)&&ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.INTERNET)&&ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_NETWORK_STATE)&&ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_WIFI_STATE)) {
 
             } else {
 
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.INTERNET,Manifest.permission.ACCESS_WIFI_STATE,Manifest.permission.ACCESS_NETWORK_STATE},
                         MY_PERMISSIONS_REQUEST_READ_WRITE_FILES);
 
             }
@@ -239,19 +253,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // permissions this app might request.
         }
     }
-    public void bubbleSort(Vector<File> files){
-        while(!sorted)
-        {   sorted=true;
-            int j=0;
-            while(j<files.size()-1){
-                if(files.get(j).lastModified()<files.get(j+1).lastModified())
-                {   sorted=false;
-                    Collections.swap(files,j,j+1);
-                }
-                j++;
-            }
-        }
-    }
+
 
 
 

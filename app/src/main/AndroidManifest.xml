@@ -4,9 +4,11 @@
     package="com.shubhamr837.pdfoffice">
 
     <dist:module dist:instant="true" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -15,12 +17,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.PdfReadActivity"
+        <activity
+            android:name=".activity.DownloadFileActivity"
+            android:label="@string/title_activity_download_file"
+            android:parentActivityName=".activity.PdfReadActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.shubhamr837.pdfoffice.activity.PdfReadActivity" />
+        </activity>
+        <activity
+            android:name=".activity.PdfReadActivity"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.shubhamr837.pdfoffice.MainActivity" /></activity>
+                android:value="com.shubhamr837.pdfoffice.MainActivity" />
+        </activity>
         <activity
             android:name=".activity.ImageSelectionActivity"
             android:parentActivityName=".MainActivity">
