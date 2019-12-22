@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             pdf_files.add(ff);
 
                         }
-                        else if (ff.isFile() &&( ff.getPath().endsWith(".doc")||ff.getPath().endsWith(".DOC"))){
+                        else if (ff.isFile() &&( ff.getPath().endsWith(".docx")||ff.getPath().endsWith(".DOCX"))){
                             doc_files.add(ff);
                         }
                         else if (ff.isFile() && ff.getPath().endsWith(".txt")){
@@ -182,15 +182,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case 0:
                   intent = new Intent(this, FilesSelection.class);
                   intent.putExtra("type","pdf");
-                  intent.putExtra("to","doc");
+                  intent.putExtra("to","docx");
                   intent.putExtra("tittle","select a file");
-                  intent.putExtra("intent","Convert to Doc");
+                  intent.putExtra("intent","Convert to Docx");
                   FilesListAdapter.files=pdf_files;
                   startActivity(intent);
                   break;
 
             case 1:intent = new Intent(this, FilesSelection.class);
-                   intent.putExtra("type","doc");
+                   intent.putExtra("type","docx");
                    intent.putExtra("to","pdf");
                    intent.putExtra("tittle","select a file");
                    FilesListAdapter.files=doc_files;

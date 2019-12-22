@@ -3,9 +3,15 @@ package com.shubhamr837.pdfoffice.activity;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -19,6 +25,7 @@ import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.NetworkUtils;
 import com.shubhamr837.pdfoffice.R;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -40,6 +47,8 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
     public TextView textView;
     public File pdf_file;
     public String pdf_intent;
+    private PDFView.Configurator configurator;
+    private boolean nightModeState=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,14 +70,17 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
         }
         pdfView = (PDFView) findViewById(R.id.pdfView);
         pdf_file = new File(getIntent().getExtras().getString("file_path"));
-        pdfView.fromFile(pdf_file).enableSwipe(true)
+        configurator=pdfView.fromFile(pdf_file);
+        configurator.onLoad(this)
+                .onPageScroll(this)
+                .enableSwipe(true)
                 .enableDoubletap(true)
                 .defaultPage(0)
                 .enableAnnotationRendering(true)
                 .password(null)
                 .scrollHandle(null)
                 .enableAntialiasing(true)
-                .spacing(2).nightMode(true)
+                .spacing(2).nightMode(nightModeState)
                 .swipeHorizontal(true).load();
        if(!pdf_intent.startsWith("Convert")) {
            
@@ -102,6 +114,80 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
 
 
     }
+    public class DownloadTask extends AsyncTask<File,Integer, Intent>{
+        public JSONObject jsonObject;
+        private Context context;
+        public CustomDialogFragment customDialogFragment;
+
+
+        public DownloadTask(Context context,CustomDialogFragment customDialogFragment)
+        {
+         this.context=context;
+         this.customDialogFragment=customDialogFragment;
+        }
+
+
+        @Override
+        protected Intent doInBackground(File... files) {
+            File pdf_file = files[0];
+            Intent downloadActivityIntent;
+            int bytesRead;
+
+            ByteArrayOutputStream bos= new ByteArrayOutputStream();
+            try {
+                URL url = new URL("https://www.google.com/");
+                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setRequestProperty("Content-Type","application/x-binary; utf-8");
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.connect();
+                OutputStream out = httpURLConnection.getOutputStream();
+                FileInputStream in = new FileInputStream(pdf_file);
+                byte[] buffer = new byte[1024];
+                while (true) {
+                    bytesRead = in.read(buffer);
+                    if (bytesRead == -1)
+                        break;
+                    out.write(buffer, 0, bytesRead);
+                }
+                out.close();
+                in.close();
+                InputStream inputStream;
+                Thread.sleep(2000);
+                if (httpURLConnection.getResponseCode() < 400) {
+                    inputStream = httpURLConnection.getInputStream();
+                } else {
+                    inputStream = httpURLConnection.getErrorStream();
+                }
+
+                buffer = new byte[1024];
+                while (-1 != (bytesRead = inputStream.read(buffer))) {
+                    bos.write(buffer, 0, bytesRead);
+                }
+                jsonObject = new JSONObject(new String(bos.toByteArray()));
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            customDialogFragment.dismiss();
+            downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
+            downloadActivityIntent.putExtra("type","pdf");
+            if(jsonObject!=null)
+            try {
+                downloadActivityIntent.putExtra("download_link",jsonObject.getString("download-link"));
+                downloadActivityIntent.putExtra("file_name",jsonObject.getString("file_name"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return downloadActivityIntent;
+        }
+        protected void onPostExecute(Intent downloadActivityIntent) {
+            startActivity(downloadActivityIntent);
+            customDialogFragment.dismiss();
+
+        }
+    }
 
     @Override
     public void onClick(View view) {
@@ -113,9 +199,8 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 customDialogFragment = new CustomDialogFragment("Converting File","Please wait...",true);
                 customDialogFragment.setCancelable(false);
                 customDialogFragment.show(getSupportFragmentManager(),"Convert File Fragment");
-                NetworkUtils networkUtils = new NetworkUtils(pdf_file,customDialogFragment,this);
-                Thread thread=new Thread(networkUtils);
-                thread.start();
+                DownloadTask downloadTask = new DownloadTask(this,customDialogFragment);
+                downloadTask.execute(pdf_file);
 
                 }
                 else
@@ -124,13 +209,31 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.pdf_reader_menu,menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.night_mode_toggle:
+                nightModeState=(!nightModeState);
+                configurator.nightMode(nightModeState).defaultPage(pdfView.getCurrentPage()).load();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
     public void onPageScrolled(int page, float positionOffset) {
-        seekBar.setProgress(page);
+       if(seekBar!=null) { seekBar.setProgress(page);
         textView.setText("Page "+page + "/" + seekBar.getMax());
+    }
     }
 
     @Override
     public void loadComplete(int nbPages) {
+        if(seekBar!=null)
         seekBar.setMax(nbPages-1);
     }
 

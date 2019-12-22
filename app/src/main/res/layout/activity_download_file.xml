@@ -14,29 +14,34 @@
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
         android:text="Your File is ready"
         android:fontFamily="sans-serif-light"
         android:textColor="@color/black"
         android:textSize="25dp"
         android:layout_gravity="center"
-        android:paddingTop="100dp"
-        android:paddingBottom="50dp"></TextView>
+        android:paddingTop="10dp"></TextView>
 <ImageView
     android:id="@+id/fileIcon"
+    android:padding="50dp"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="0dp"
+    android:layout_weight="0.5"
     android:paddingTop="50dp"
    android:layout_marginBottom="50dp"
     android:layout_gravity="center"
+    android:src="@drawable/pdf"
 
 ></ImageView>
     <TextView
         android:id="@+id/fileName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
         android:layout_gravity="center"
         android:textSize="20dp"
+        android:text="helloworldfilesdnc sdjknjsrnoifhsrif"
         ></TextView>
     </LinearLayout>
 

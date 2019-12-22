@@ -38,7 +38,7 @@ public TextView file_name;
         {
             case "pdf":System.out.println("Recieved Pdf");
 
-            case "doc":
+            case "docx":
 
             case "txt":
         }

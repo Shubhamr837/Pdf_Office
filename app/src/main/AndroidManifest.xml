@@ -20,14 +20,15 @@
         <activity
             android:name=".activity.DownloadFileActivity"
             android:label="@string/title_activity_download_file"
-            android:parentActivityName=".activity.PdfReadActivity"
+            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.shubhamr837.pdfoffice.activity.PdfReadActivity" />
+                android:value="com.shubhamr837.pdfoffice.MainActivity" />
         </activity>
         <activity
             android:name=".activity.PdfReadActivity"
+            android:launchMode="singleInstance"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme">
             <meta-data

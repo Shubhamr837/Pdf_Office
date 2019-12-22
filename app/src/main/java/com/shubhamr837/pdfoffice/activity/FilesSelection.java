@@ -66,7 +66,7 @@ public class FilesSelection extends AppCompatActivity {
         type = bundle.getString("type");
 
 
-        mAdapter = new FilesListAdapter(pdf_intent,type);
+        mAdapter = new FilesListAdapter(pdf_intent,type,getSupportFragmentManager());
         recyclerView.setAdapter(mAdapter);
 
 
