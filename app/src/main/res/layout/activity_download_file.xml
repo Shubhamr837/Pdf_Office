@@ -41,11 +41,11 @@
         android:layout_weight="0.25"
         android:layout_gravity="center"
         android:textSize="20dp"
-        android:text="helloworldfilesdnc sdjknjsrnoifhsrif"
         ></TextView>
     </LinearLayout>
 
     <Button
+        android:id="@+id/download_button"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.1"

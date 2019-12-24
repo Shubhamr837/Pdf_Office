@@ -2,10 +2,13 @@ package com.shubhamr837.pdfoffice.activity;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.camera2.params.BlackLevelPattern;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
