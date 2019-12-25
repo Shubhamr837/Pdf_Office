@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -11,7 +12,7 @@ import java.util.zip.ZipOutputStream;
 
 public class Packager
 {
-    public static void packZip(File output, List<File> sources) throws IOException
+    public static void packZip(File output, ArrayList<File> sources) throws IOException
     {
         System.out.println("Packaging to " + output.getName());
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(output));
@@ -26,6 +27,7 @@ public class Packager
             {
                 zipFile(zipOut, "", source);
             }
+            source.delete();
         }
         zipOut.flush();
         zipOut.close();
@@ -47,7 +49,7 @@ public class Packager
     {
         if (!dir.canRead())
         {
-            System.out.println("Cannot read " + dir.getCanonicalPath() + " (maybe because of permissions)");
+            System.out.println("Cannot read " + dir.getAbsolutePath() + " (maybe because of permissions)");
             return;
         }
 
@@ -73,7 +75,7 @@ public class Packager
     {
         if (!file.canRead())
         {
-            System.out.println("Cannot read " + file.getCanonicalPath() + " (maybe because of permissions)");
+            System.out.println("Cannot read " + file.getAbsolutePath() + " (maybe because of permissions)");
             return;
         }
 
