@@ -4,7 +4,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -57,12 +60,38 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+        Intent intent;
         switch (position){
             case 0:
 
-            case 1:new
+            case 1:
+                intent = new Intent();
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE);
+
 
         }
 
     }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Uri imageUri;
+        if(requestCode == PICK_IMAGE) {
+            if(resultCode == Activity.RESULT_OK) {
+                if(data.getClipData() != null) {
+                    int count = data.getClipData().getItemCount(); //evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
+                    for(int i = 0; i < count; i++)
+                       imageUri = data.getClipData().getItemAt(i).getUri();
+
+                }
+            } else if(data.getData() != null) {
+                String imagePath = data.getData().getPath();
+                //do something with the image (save it to some directory or whatever you need to do with it here)
+            }
+        }
+    }
 }
+
