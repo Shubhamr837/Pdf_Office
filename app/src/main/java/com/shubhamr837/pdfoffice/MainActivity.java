@@ -1,5 +1,6 @@
 package com.shubhamr837.pdfoffice;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -16,8 +17,11 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.activity.ImageSelectionActivity;
 import com.shubhamr837.pdfoffice.activity.FilesSelection;
@@ -132,7 +136,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(user==null)
             authenticate();
         else
-        {customDialogFragment = new CustomDialogFragment("Please wait","Searching all Pdf files...",false);
+        {
+            user.getIdToken(true)
+                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                        public void onComplete(@NonNull Task<GetTokenResult> task) {
+                            if (task.isSuccessful()) {
+                                String idToken = task.getResult().getToken();
+                                System.out.println("lawda"+ idToken);
+                                // Send token to your backend via HTTPS
+                                // ...
+                            } else {
+                                // Handle error -> task.getException();
+                            }
+                        }
+                    });
+
+            customDialogFragment = new CustomDialogFragment("Please wait","Searching all Pdf files...",false);
          customDialogFragment.setCancelable(false);
          customDialogFragment.show(getSupportFragmentManager(),"Sacnning Files ...");
         }
@@ -152,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(getApplicationContext(),"Sucessfully Signed in",Toast.LENGTH_SHORT).show();
                     customDialogFragment = new CustomDialogFragment("Please wait","Searching all Pdf files...",false);
                     customDialogFragment.setCancelable(false);
-                    customDialogFragment.show(getSupportFragmentManager(),"Sacnning Files ...");
+                   // customDialogFragment.show(getSupportFragmentManager(),"Sacnning Files ...");
 
                 }
                 else if(resultCode==RESULT_CANCELED){
