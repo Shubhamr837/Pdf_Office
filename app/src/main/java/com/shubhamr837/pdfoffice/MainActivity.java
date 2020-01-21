@@ -6,58 +6,65 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.activity.ImageSelectionActivity;
 import com.shubhamr837.pdfoffice.activity.FilesSelection;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
 import com.shubhamr837.pdfoffice.activity.EmailPasswordActivity;
-import com.shubhamr837.pdfoffice.utils.Utils;
-
+import com.shubhamr837.pdfoffice.utils.ScanFiles;
 import java.io.File;
-import java.util.Collections;
-import java.util.Stack;
+import java.lang.reflect.Type;
 import java.util.Vector;
 
-import static com.shubhamr837.pdfoffice.utils.Utils.bubbleSort;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener , AdapterView.OnItemClickListener
 {
-    FirebaseUser user ;
+    private FirebaseUser user ;
     private static final int AUTHENTICATION_REQUEST_CODE = 1;
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_FILES=1;
-    public Vector<File> pdf_files = new Vector<>() ;
-    public Vector<File> doc_files = new Vector<>();
-    public Vector<File> txt_files = new Vector<>();
-    public static Thread scan_files;
-    CustomDialogFragment customDialogFragment;
+    public static final String pdf_files_list = "PDF_FILES_LIST";
+    public static final String txt_files_list = "TXT_FILES_LIST";
+    public static final String doc_files_list = "DOC_FILES_LIST";
+    public static MainActivity instance;
+
+    public static Vector<File> pdf_files = new Vector<>() ;
+    public static Vector<File> doc_files = new Vector<>() ;
+    public static Vector<File> txt_files = new Vector<>() ;;
+    public CustomDialogFragment customDialogFragment;
+    public ScanFiles scanFiles = new ScanFiles(this);
+    public Thread scan_files = new Thread(scanFiles);
+
 
 
     public Integer[] mThumbIds = {
-            R.drawable.pdf_to_word, R.drawable.word_to_pdf,
-            R.drawable.pdf_to_text,R.drawable.text_to_pdf,
+            R.drawable.pdf_to_word,
+            R.drawable.pdf_to_text,
             R.drawable.pdf_to_image,R.drawable.image_to_pdf
 
     };
     public Integer[] mStrings = {
-            R.string.pdf_to_word,R.string.word_to_pdf,
-            R.string.pdf_to_text,R.string.text_to_pdf,
+            R.string.pdf_to_word,
+            R.string.pdf_to_text,
             R.string.pdf_to_image,R.string.image_to_pdf
 
     };
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance =  this;
         setContentView(R.layout.activity_main);
         getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -74,34 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         findViewById(R.id.pdf_reader).setOnClickListener(this);
         GridView gridview = (GridView) findViewById(R.id.gridview);
-        scan_files = new Thread(){
-            public void run(){
-                File f = Environment.getExternalStorageDirectory();
-                Stack<File> stack = new Stack<File>();
-                stack.push(f);
-                while(!stack.isEmpty()) {
-                    f = stack.pop();
-                    File[] file = f.listFiles();
-                    for (File ff : file) {
-                        if (ff.isDirectory()) stack.push(ff);
-                        else if (ff.isFile() && ff.getPath().endsWith(".pdf")) {
-                            pdf_files.add(ff);
-
-                        }
-                        else if (ff.isFile() &&( ff.getPath().endsWith(".docx")||ff.getPath().endsWith(".DOCX"))){
-                            doc_files.add(ff);
-                        }
-                        else if (ff.isFile() && ff.getPath().endsWith(".txt")){
-                            txt_files.add(ff);
-                        }
-                    }
-                }
-                bubbleSort(pdf_files);bubbleSort(doc_files);bubbleSort(txt_files);
-                customDialogFragment.dismiss();
-
-
-            }
-        };
+        getFiles();
 
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -115,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Manifest.permission.INTERNET)&&ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_NETWORK_STATE)&&ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_WIFI_STATE)) {
+                scan_files.start();
 
             } else {
 
@@ -125,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         else{
-            if(pdf_files.size()<1)
             scan_files.start();
         }
         gridview.setAdapter(new GridAdapter(this,mThumbIds,mStrings));
@@ -135,26 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         user = FirebaseAuth.getInstance().getCurrentUser();
         if(user==null)
             authenticate();
-        else
-        {
-            user.getIdToken(true)
-                    .addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                        public void onComplete(@NonNull Task<GetTokenResult> task) {
-                            if (task.isSuccessful()) {
-                                String idToken = task.getResult().getToken();
-                                System.out.println("lawda"+ idToken);
-                                // Send token to your backend via HTTPS
-                                // ...
-                            } else {
-                                // Handle error -> task.getException();
-                            }
-                        }
-                    });
 
-            customDialogFragment = new CustomDialogFragment("Please wait","Searching all Pdf files...",false);
-         customDialogFragment.setCancelable(false);
-         customDialogFragment.show(getSupportFragmentManager(),"Sacnning Files ...");
-        }
     }
 
     public void authenticate(){
@@ -169,16 +131,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case AUTHENTICATION_REQUEST_CODE:
                 if(resultCode==RESULT_OK) {
                     Toast.makeText(getApplicationContext(),"Sucessfully Signed in",Toast.LENGTH_SHORT).show();
-                    customDialogFragment = new CustomDialogFragment("Please wait","Searching all Pdf files...",false);
-                    customDialogFragment.setCancelable(false);
-                   // customDialogFragment.show(getSupportFragmentManager(),"Sacnning Files ...");
+                    if(scan_files.isAlive()){
+                        customDialogFragment = new CustomDialogFragment("Please Wait","Scanning files ...",false);
+                        customDialogFragment.setCancelable(false);
+                        customDialogFragment.show(getSupportFragmentManager(),"scan_files");
+                        while(scan_files.isAlive());
+                        customDialogFragment.dismiss();
 
+                    }
                 }
                 else if(resultCode==RESULT_CANCELED){
                     finish();
                 }
                 else {
                     Toast.makeText(getApplicationContext(),"Authentication failure",Toast.LENGTH_SHORT).show();
+                    finish();
                 }
         }
     }
@@ -206,35 +173,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                   intent.putExtra("type","pdf");
                   intent.putExtra("to","docx");
                   intent.putExtra("tittle","select a file");
-                  intent.putExtra("intent","Convert to Docx");
+                  intent.putExtra("intent","Convert_to_DOCX");
                   FilesListAdapter.files=pdf_files;
                   startActivity(intent);
                   break;
 
-            case 1:intent = new Intent(this, FilesSelection.class);
-                   intent.putExtra("type","docx");
-                   intent.putExtra("to","pdf");
-                   intent.putExtra("tittle","select a file");
-                   FilesListAdapter.files=doc_files;
-                   startActivity(intent);
-                   break;
 
-            case 2:intent = new Intent(this, FilesSelection.class);
+            case 1:intent = new Intent(this, FilesSelection.class);
                 intent.putExtra("type","pdf");
                 intent.putExtra("to","txt");
                 intent.putExtra("tittle","select a file");
+                intent.putExtra("intent","Convert_to_TXT");
                 FilesListAdapter.files=pdf_files;
                 startActivity(intent);
                 break;
 
-            case 3:intent = new Intent(this, FilesSelection.class);
-                intent.putExtra("type","txt");
-                intent.putExtra("to","pdf");
-                intent.putExtra("tittle","select a file");
-                FilesListAdapter.files=txt_files;
-                startActivity(intent);
-                break;
-            case 4:intent = new Intent(this, FilesSelection.class);
+            case 2:intent = new Intent(this, FilesSelection.class);
                 intent.putExtra("type","pdf");
                 intent.putExtra("to","img");
                 intent.putExtra("tittle","select a file");
@@ -242,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
                 break;
 
-            case 5:
+            case 3:
                 intent= new Intent(this,ImageSelectionActivity.class);
                 startActivity(intent);
                 break;
@@ -257,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case MY_PERMISSIONS_REQUEST_READ_WRITE_FILES: {
 
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED && !scan_files.isAlive()) {
                     scan_files.start();
                 } else {
                   finish();
@@ -265,13 +219,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
-
-
+    public void getFiles(){
+        Type type;
+        String json;
+        Gson gson = new Gson();
+        SharedPreferences appSharedPrefs = PreferenceManager
+                .getDefaultSharedPreferences(this.getApplicationContext());
+        if(appSharedPrefs.contains(pdf_files_list)&&appSharedPrefs.contains(doc_files_list)&&appSharedPrefs.contains(txt_files_list)) {
+            json = appSharedPrefs.getString(pdf_files_list, "");
+            type = new TypeToken<Vector<File>>() {
+            }.getType();
+            pdf_files = gson.fromJson(json, type);
+            json = appSharedPrefs.getString(txt_files_list, "");
+            txt_files = gson.fromJson(json, type);
+            json = appSharedPrefs.getString(doc_files_list, "");
+            doc_files = gson.fromJson(json, type);
+        }
+    }
+    public static MainActivity getInstance(){
+        return instance;
+    }
 
 }
 

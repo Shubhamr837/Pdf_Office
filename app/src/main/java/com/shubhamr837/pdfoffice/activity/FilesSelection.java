@@ -14,6 +14,7 @@ import androidx.core.app.NavUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.MainActivity;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
@@ -32,12 +33,11 @@ public class FilesSelection extends AppCompatActivity {
     private Bundle bundle;
     public String type;
     public String pdf_intent;
+    public static CustomDialogFragment customDialogFragment = new CustomDialogFragment("Please wait","Scanning files...",false); ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        while (MainActivity.scan_files.isAlive());
 
         bundle = getIntent().getExtras();
         if(bundle.containsKey("intent"))
@@ -68,6 +68,11 @@ public class FilesSelection extends AppCompatActivity {
 
         mAdapter = new FilesListAdapter(pdf_intent,type,getSupportFragmentManager());
         recyclerView.setAdapter(mAdapter);
+        if( (MainActivity.getInstance().scan_files.isAlive()))
+        {
+            customDialogFragment.setCancelable(false);
+            customDialogFragment.show(getSupportFragmentManager(),"scan_files");
+        }
 
 
     }

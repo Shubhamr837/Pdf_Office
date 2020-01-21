@@ -2,13 +2,10 @@ package com.shubhamr837.pdfoffice.activity;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.hardware.camera2.params.BlackLevelPattern;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,8 +22,8 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
-import com.shubhamr837.pdfoffice.NetworkUtils;
 import com.shubhamr837.pdfoffice.R;
+import com.shubhamr837.pdfoffice.utils.CommonConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +34,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import static com.shubhamr837.pdfoffice.utils.Utils.isNetworkConnected;
@@ -52,11 +48,12 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
     public String pdf_intent;
     private PDFView.Configurator configurator;
     private boolean nightModeState=false;
+    private DownloadTask downloadTask;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         pdf_intent = getIntent().getExtras().getString("intent");
-        if(pdf_intent.startsWith("Convert"))
+        if(pdf_intent!=null&&pdf_intent.startsWith("Convert"))
         {setContentView(R.layout.activity_pdf_read_and_convert);
             ((Button)findViewById(R.id.convert_button)).setOnClickListener(this);
         }
@@ -85,7 +82,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 .enableAntialiasing(true)
                 .spacing(2).nightMode(nightModeState)
                 .swipeHorizontal(true).load();
-       if(!pdf_intent.startsWith("Convert")) {
+       if(pdf_intent!=null&&!pdf_intent.startsWith("Convert")) {
            
             seekBar = (SeekBar) findViewById(R.id.seekBar);
             textView = (TextView) findViewById(R.id.textView);
@@ -121,12 +118,15 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
         public JSONObject jsonObject;
         private Context context;
         public CustomDialogFragment customDialogFragment;
+        public String convert_to ;
 
 
-        public DownloadTask(Context context,CustomDialogFragment customDialogFragment)
+        public DownloadTask(Context context,CustomDialogFragment customDialogFragment , String convert_to)
         {
          this.context=context;
+         this.convert_to=convert_to;
          this.customDialogFragment=customDialogFragment;
+
         }
 
 
@@ -135,40 +135,56 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
             File pdf_file = files[0];
             Intent downloadActivityIntent;
             int bytesRead;
+            URL url ;
+            HttpURLConnection httpURLConnection ;
 
             ByteArrayOutputStream bos= new ByteArrayOutputStream();
             try {
-                URL url = new URL("https://www.google.com/");
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setRequestProperty("Content-Type","application/x-binary; utf-8");
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream out = httpURLConnection.getOutputStream();
-                FileInputStream in = new FileInputStream(pdf_file);
-                byte[] buffer = new byte[1024];
-                while (true) {
-                    bytesRead = in.read(buffer);
-                    if (bytesRead == -1)
-                        break;
-                    out.write(buffer, 0, bytesRead);
-                }
-                out.close();
-                in.close();
-                InputStream inputStream;
-                Thread.sleep(2000);
-                if (httpURLConnection.getResponseCode() < 400) {
-                    inputStream = httpURLConnection.getInputStream();
-                } else {
-                    inputStream = httpURLConnection.getErrorStream();
-                }
 
-                buffer = new byte[1024];
-                while (-1 != (bytesRead = inputStream.read(buffer))) {
-                    bos.write(buffer, 0, bytesRead);
+                if(convert_to=="DOCX") {
+                    url = new URL(CommonConstants.DOCX_CONVERSION_URL);
+                    httpURLConnection = (HttpURLConnection)url.openConnection();
                 }
-                jsonObject = new JSONObject(new String(bos.toByteArray()));
+                else if(convert_to=="TXT")
+                {
+                    url = new URL(CommonConstants.TXT_CONVERSION_URL);
+                    httpURLConnection = (HttpURLConnection)url.openConnection();
 
+                }
+                else {
+                    return null;
+                }
+                if(httpURLConnection!=null) {
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setRequestProperty("Content-Type", "application/x-binary; utf-8");
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.connect();
+                    OutputStream out = httpURLConnection.getOutputStream();
+                    FileInputStream in = new FileInputStream(pdf_file);
+                    byte[] buffer = new byte[1024];
+                    while (true) {
+                        bytesRead = in.read(buffer);
+                        if (bytesRead == -1)
+                            break;
+                        out.write(buffer, 0, bytesRead);
+                    }
+                    out.close();
+                    in.close();
+                    InputStream inputStream;
+                    Thread.sleep(2000);
+                    if (httpURLConnection.getResponseCode() < 400) {
+                        inputStream = httpURLConnection.getInputStream();
+                    } else {
+                        inputStream = httpURLConnection.getErrorStream();
+                    }
+
+                    buffer = new byte[1024];
+                    while (-1 != (bytesRead = inputStream.read(buffer))) {
+                        bos.write(buffer, 0, bytesRead);
+                    }
+                    jsonObject = new JSONObject(new String(bos.toByteArray()));
+
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -202,7 +218,14 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 customDialogFragment = new CustomDialogFragment("Converting File","Please wait...",true);
                 customDialogFragment.setCancelable(false);
                 customDialogFragment.show(getSupportFragmentManager(),"Convert File Fragment");
-                DownloadTask downloadTask = new DownloadTask(this,customDialogFragment);
+                if(pdf_intent.endsWith("DOCX"))
+                {
+                    downloadTask = new DownloadTask(this,customDialogFragment,"DOCX");
+                }
+                else if(pdf_intent.endsWith("TXT"))
+                {
+                    downloadTask = new DownloadTask(this,customDialogFragment,"TXT");
+                }
                 downloadTask.execute(pdf_file);
 
                 }

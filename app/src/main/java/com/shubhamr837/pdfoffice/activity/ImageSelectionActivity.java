@@ -30,7 +30,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,13 +37,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class ImageSelectionActivity extends AppCompatActivity implements  AdapterView.OnItemClickListener{
     int PICK_IMAGE=1;
     public Integer[] mThumbIds = {
-            R.drawable.camera_icon,R.drawable.gallery_icon
+            R.drawable.camera_icon,R.drawable.image_icon
     };
     public Integer[] mStrings = {
             R.string.select_from_camera,R.string.select_from_gallery
