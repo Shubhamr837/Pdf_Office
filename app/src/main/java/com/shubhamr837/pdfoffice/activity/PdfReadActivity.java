@@ -24,6 +24,7 @@ import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
+import com.shubhamr837.pdfoffice.utils.FirebaseUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -156,8 +157,9 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 if(httpURLConnection!=null) {
                     httpURLConnection.setDoOutput(true);
-                    httpURLConnection.setRequestProperty("Content-Type", "application/x-binary; utf-8");
                     httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/x-binary; utf-8");
+                    httpURLConnection.setRequestProperty("auth-token", FirebaseUtils.getToken());
                     httpURLConnection.connect();
                     OutputStream out = httpURLConnection.getOutputStream();
                     FileInputStream in = new FileInputStream(pdf_file);
