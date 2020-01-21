@@ -1,6 +1,9 @@
 package com.shubhamr837.pdfoffice.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -16,14 +19,36 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
+import com.shubhamr837.pdfoffice.utils.CommonConstants;
+import com.shubhamr837.pdfoffice.utils.FirebaseUtils;
 import com.shubhamr837.pdfoffice.utils.HttpUtils;
+import com.shubhamr837.pdfoffice.utils.Packager;
+import com.shubhamr837.pdfoffice.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+
+import static com.shubhamr837.pdfoffice.utils.Packager.unzip;
 
 public class DownloadFileActivity extends AppCompatActivity implements View.OnClickListener {
 public String type;
 private TextView file_name;
+private String download_link;
 private Button download_button;
 private ImageView file_icon;
 private URL url;
@@ -35,6 +60,7 @@ private HttpUtils httpUtils = new HttpUtils();
         file_name=(TextView)findViewById(R.id.fileName);
         download_button=(Button)findViewById(R.id.download_button);
         file_icon = (ImageView)findViewById(R.id.fileIcon);
+        download_link = getIntent().getExtras().getString(CommonConstants.DOWNLOAD_LINK_KEY);
 
 
         file_name.setText("feature under development");
@@ -58,7 +84,6 @@ private HttpUtils httpUtils = new HttpUtils();
         {
             case "pdf": file_icon.setImageResource(R.drawable.pdf_icon);
 
-
             break;
 
             case "docx": file_icon.setImageResource(R.drawable.doc_icon);
@@ -79,7 +104,78 @@ private HttpUtils httpUtils = new HttpUtils();
     switch (view.getId()){
 
         case R.id.download_button :
-            httpUtils.downloadFile(url,type);
+            DownloadTask downloadTask = new DownloadTask(this,new CustomDialogFragment("Downloading file","please wait",false));
+            try {
+                downloadTask.execute(new URL(download_link));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            break;
     }
+    }
+    private class DownloadTask extends AsyncTask<URL,Integer, File> {
+        public JSONObject jsonObject;
+        private Context context;
+        public CustomDialogFragment customDialogFragment;
+        private File downloaded_file;
+
+
+        public DownloadTask(Context context,CustomDialogFragment customDialogFragment )
+        {
+            this.context=context;
+            this.customDialogFragment=customDialogFragment;
+
+        }
+
+
+        @Override
+        protected File doInBackground(URL... urls) {
+            URL url = urls[0] ;
+            HttpURLConnection httpURLConnection ;
+            customDialogFragment.setCancelable(false);
+            customDialogFragment.show(((DownloadFileActivity)context).getSupportFragmentManager(),"downloading_file");
+            String file_name = java.util.UUID.randomUUID().toString();
+            if(file_name.length()>30){
+                file_name = file_name.substring(0 , 30);
+            }
+
+            if(type=="img"){
+                try {
+                    downloaded_file = File.createTempFile("temp","file");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                downloaded_file = new File(context.getObbDir() , file_name);
+            }
+
+
+            try (BufferedInputStream in = new BufferedInputStream(new URL(download_link).openStream());
+                 FileOutputStream fileOutputStream = new FileOutputStream(downloaded_file)) {
+                byte dataBuffer[] = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                    fileOutputStream.write(dataBuffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                // handle exception
+            }
+            return downloaded_file;
+
+        }
+        protected void onPostExecute(File file) {
+            if(type=="img")
+            {
+                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),context.getObbDir().toString(),context);
+                for(File mfile: fileArrayList){
+                    Utils.addImageToGallery(mfile.getAbsolutePath(),context);
+                }
+                downloaded_file.delete();
+
+            }
+                customDialogFragment.dismiss();
+
+        }
     }
 }

@@ -1,13 +1,17 @@
 package com.shubhamr837.pdfoffice.utils;
 
+import android.content.Context;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class Packager
@@ -96,5 +100,43 @@ public class Packager
 
         fis.close();
         zos.closeEntry();
+    }
+    public static ArrayList<File> unzip(String zipFilePath, String destDir, Context context) {
+        ArrayList<File> fileList = new ArrayList<File>();
+        FileInputStream fis;
+        //buffer for read and write data to file
+        byte[] buffer = new byte[1024];
+        try {
+            fis = new FileInputStream(zipFilePath);
+            ZipInputStream zis = new ZipInputStream(fis);
+            ZipEntry ze = zis.getNextEntry();
+            while (ze != null) {
+                String fileName = java.util.UUID.randomUUID().toString();
+                if(fileName.length()>30){
+                    fileName.substring(0,30);
+                }
+                File newFile = new File(context.getObbDir(),fileName);
+                System.out.println("Unzipping to " + newFile.getAbsolutePath());
+                //create directories for sub directories in zip
+                FileOutputStream fos = new FileOutputStream(newFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                fos.close();
+                fileList.add(newFile);
+                //close this ZipEntry
+                zis.closeEntry();
+
+                ze = zis.getNextEntry();
+            }
+            //close last ZipEntry
+            zis.closeEntry();
+            zis.close();
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return fileList;
     }
 }

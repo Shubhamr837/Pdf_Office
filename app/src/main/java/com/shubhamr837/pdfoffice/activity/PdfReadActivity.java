@@ -115,7 +115,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
 
 
     }
-    public class DownloadTask extends AsyncTask<File,Integer, Intent>{
+    private class DownloadTask extends AsyncTask<File,Integer, Intent>{
         public JSONObject jsonObject;
         private Context context;
         public CustomDialogFragment customDialogFragment;
@@ -193,11 +193,11 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
             }
             customDialogFragment.dismiss();
             downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
-            downloadActivityIntent.putExtra("type","pdf");
             if(jsonObject!=null)
             try {
-                downloadActivityIntent.putExtra("download_link",jsonObject.getString("download-link"));
-                downloadActivityIntent.putExtra("file_name",jsonObject.getString("file_name"));
+                downloadActivityIntent.putExtra("download_link",jsonObject.getString("download_link"));
+                downloadActivityIntent.putExtra("file_name",pdf_file.getName());
+                downloadActivityIntent.putExtra("type", convert_to);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

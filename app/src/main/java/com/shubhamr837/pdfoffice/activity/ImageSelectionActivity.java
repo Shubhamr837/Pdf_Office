@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
 import android.app.Activity;
+import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +24,7 @@ import android.widget.GridView;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
+import com.shubhamr837.pdfoffice.utils.CommonConstants;
 import com.shubhamr837.pdfoffice.utils.Packager;
 
 import org.json.JSONException;
@@ -164,15 +167,10 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
                 e.printStackTrace();
             }
 
-
-
-
-            System.out.println("Temp Zip File created at "+zip_file.getAbsolutePath());
-
-
+            Log.i("Temp Zip File created",zip_file.getAbsolutePath());
 
             try {
-                URL url = new URL("https://www.google.com/");
+                URL url = new URL(CommonConstants.IMG_TO_PDF_CONVERSION_URL);
                 HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.setRequestProperty("Content-Type","application/x-binary; utf-8");
@@ -209,11 +207,12 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
             }
 
             downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
-            downloadActivityIntent.putExtra("type","pdf");
+
             if(jsonObject!=null)
                 try {
-                    downloadActivityIntent.putExtra("download_link",jsonObject.getString("download-link"));
-                    downloadActivityIntent.putExtra("file_name",jsonObject.getString("file_name"));
+                    downloadActivityIntent.putExtra(CommonConstants.DOWNLOAD_LINK_KEY,jsonObject.getString("download_link"));
+                    downloadActivityIntent.putExtra("file_name","Images");
+                    downloadActivityIntent.putExtra("type","pdf");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
