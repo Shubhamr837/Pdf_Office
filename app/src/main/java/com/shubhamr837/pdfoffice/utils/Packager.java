@@ -101,7 +101,7 @@ public class Packager
         fis.close();
         zos.closeEntry();
     }
-    public static ArrayList<File> unzip(String zipFilePath, String destDir, Context context) {
+    public static ArrayList<File> unzip(String zipFilePath, String destDir, String ext , Context context) {
         ArrayList<File> fileList = new ArrayList<File>();
         FileInputStream fis;
         //buffer for read and write data to file
@@ -115,7 +115,7 @@ public class Packager
                 if(fileName.length()>30){
                     fileName.substring(0,30);
                 }
-                File newFile = new File(context.getObbDir(),fileName);
+                File newFile = new File(context.getObbDir(),fileName+"."+ext);
                 System.out.println("Unzipping to " + newFile.getAbsolutePath());
                 //create directories for sub directories in zip
                 FileOutputStream fos = new FileOutputStream(newFile);

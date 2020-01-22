@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -149,7 +150,7 @@ private HttpUtils httpUtils = new HttpUtils();
                 }
             }
             else {
-                downloaded_file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) , file_name);
+                downloaded_file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) , file_name + ".pdf");
             }
 
 
@@ -169,15 +170,15 @@ private HttpUtils httpUtils = new HttpUtils();
         protected void onPostExecute(File file) {
             if(type=="img")
             {
-                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),context);
+                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),"jpg",context);
                 for(File mfile: fileArrayList){
                     Utils.addImageToGallery(mfile.getAbsolutePath(),context);
                 }
                 downloaded_file.delete();
 
             }
-                customDialogFragment.dismiss();
-            Toast.makeText(context,"File saved to Downloads directory",Toast.LENGTH_SHORT);
+            customDialogFragment.dismiss();
+            Toast.makeText(context,"File saved to Downloads directory",Toast.LENGTH_SHORT).show();
 
             ((DownloadFileActivity)context).finish();
 

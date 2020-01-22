@@ -50,7 +50,8 @@ import java.util.ArrayList;
 
 
 public class ImageSelectionActivity extends AppCompatActivity implements  AdapterView.OnItemClickListener{
-    int PICK_IMAGE=1;
+    private static final int PICK_IMAGE=1;
+    private static final int DOWNLOAD_ACTIVITY_REQUEST_CODE=2;
     private static Intent downloadActivityIntent ;
     public Integer[] mThumbIds = {
             R.drawable.camera_icon,R.drawable.image_icon
@@ -127,6 +128,10 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
                 //do something with the image (save it to some directory or whatever you need to do with it here)
             }
         }
+        else if (requestCode == DOWNLOAD_ACTIVITY_REQUEST_CODE )
+        {
+            finish();
+        }
     }
     private class SendImages extends AsyncTask<File , Integer , Intent>{
 
@@ -200,7 +205,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
                 HttpResponse response = httpclient.execute(httppost);
                 jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
                 //Do something with response..
-                System.out.println(jsonObject+ "lawda");
+                zip_file.delete();
 
 
             } catch (Exception e) {
@@ -222,7 +227,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
 
         protected void onPostExecute(Intent downloadActivityIntent) {
             if(downloadActivityIntent!=null){
-                context.startActivity(downloadActivityIntent);
+                ((ImageSelectionActivity)context).startActivityForResult(downloadActivityIntent,DOWNLOAD_ACTIVITY_REQUEST_CODE);
                 customDialogFragment.dismiss();
             }
         }
