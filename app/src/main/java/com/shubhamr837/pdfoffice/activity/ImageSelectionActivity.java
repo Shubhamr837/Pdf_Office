@@ -25,8 +25,15 @@ import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
+import com.shubhamr837.pdfoffice.utils.FirebaseUtils;
 import com.shubhamr837.pdfoffice.utils.Packager;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,6 +51,7 @@ import java.util.ArrayList;
 
 public class ImageSelectionActivity extends AppCompatActivity implements  AdapterView.OnItemClickListener{
     int PICK_IMAGE=1;
+    private static Intent downloadActivityIntent ;
     public Integer[] mThumbIds = {
             R.drawable.camera_icon,R.drawable.image_icon
     };
@@ -60,6 +68,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
         actionBar.setDisplayHomeAsUpEnabled(true);
         GridView gridview = (GridView) findViewById(R.id.gridview);
+        downloadActivityIntent = new Intent(this, DownloadFileActivity.class);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.red, this.getTheme()));
@@ -129,6 +138,8 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
         JSONObject jsonObject;
         Context context;
 
+
+
         public SendImages(Intent data, CustomDialogFragment customDialogFragment, Context context){
             this.data = data;
             this.customDialogFragment = customDialogFragment;
@@ -138,7 +149,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
         protected Intent doInBackground(File... f) {
 
             File zip_file = f[0];
-            Intent downloadActivityIntent;
+
             int bytesRead;
 
             ByteArrayOutputStream bos= new ByteArrayOutputStream();
@@ -147,14 +158,19 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
             System.out.println("data is "+ count);//evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
             for(int i = 0; i < count; i++)
             { imagePath = data.getClipData().getItemAt(i).getUri();
-                final InputStream imageStream;
+                final InputStream in;
                 try {
                     image_file = new File(getObbDir(),"image_"+i+".jpg");
-                    FileOutputStream fileOutputStream = new FileOutputStream(image_file);
-                    imageStream = getContentResolver().openInputStream(imagePath);
-                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                    selectedImage.compress(Bitmap.CompressFormat.PNG, 100,fileOutputStream);
-                    fileOutputStream.close();
+                    FileOutputStream out = new FileOutputStream(image_file);
+                    in = getContentResolver().openInputStream(imagePath);
+                    byte[] buffer = new byte[1024];
+                    int lengthRead;
+                    while ((lengthRead = in.read(buffer)) > 0) {
+                        out.write(buffer, 0, lengthRead);
+                        out.flush();
+                    }
+                    out.close();
+                    in.close();
                     files.add(image_file);
 
                 } catch (Exception e) {
@@ -171,42 +187,26 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
 
             try {
                 URL url = new URL(CommonConstants.IMG_TO_PDF_CONVERSION_URL);
-                HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.setRequestProperty("Content-Type","application/x-binary; utf-8");
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.connect();
-                OutputStream out = httpURLConnection.getOutputStream();
-                FileInputStream in = new FileInputStream(zip_file);
-                byte[] buffer = new byte[1024];
-                while (true) {
-                    bytesRead = in.read(buffer);
-                    if (bytesRead == -1)
-                        break;
-                    out.write(buffer, 0, bytesRead);
-                }
-                out.close();
-                in.close();
-                InputStream inputStream;
-                Thread.sleep(2000);
-                if (httpURLConnection.getResponseCode() < 400) {
-                    inputStream = httpURLConnection.getInputStream();
-                } else {
-                    inputStream = httpURLConnection.getErrorStream();
-                }
+                HttpClient httpclient = new DefaultHttpClient();
 
-                buffer = new byte[1024];
-                while (-1 != (bytesRead = inputStream.read(buffer))) {
-                    bos.write(buffer, 0, bytesRead);
-                }
-                jsonObject = new JSONObject(new String(bos.toByteArray()));
+                HttpPost httppost = new HttpPost(url.toString());
+
+                InputStreamEntity reqEntity = new InputStreamEntity(
+                        new FileInputStream(zip_file), -1);
+                reqEntity.setContentType("binary/octet-stream");
+                reqEntity.setChunked(true); // Send in multiple parts if needed
+                httppost.setEntity(reqEntity);
+                HttpResponse response = httpclient.execute(httppost);
+                jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
+                //Do something with response..
+                System.out.println(jsonObject.toString()+ "lawda");
 
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
+
 
             if(jsonObject!=null)
                 try {
