@@ -25,8 +25,8 @@ import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
-import com.shubhamr837.pdfoffice.utils.FirebaseUtils;
 import com.shubhamr837.pdfoffice.utils.Packager;
+import com.shubhamr837.pdfoffice.utils.Utils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -161,7 +161,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
             { imagePath = data.getClipData().getItemAt(i).getUri();
                 final InputStream in;
                 try {
-                    image_file = new File(getObbDir(),"image_"+i+".jpg");
+                    image_file = new File(getObbDir(),"image_"+i+".png");
                     FileOutputStream out = new FileOutputStream(image_file);
                     in = getContentResolver().openInputStream(imagePath);
                     byte[] buffer = new byte[1024];
@@ -193,14 +193,14 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
                 HttpPost httppost = new HttpPost(url.toString());
 
                 InputStreamEntity reqEntity = new InputStreamEntity(
-                        new FileInputStream(new File("/storage/emulated/0/Screenshot.zip")), -1);
+                        new FileInputStream(zip_file), -1);
                 reqEntity.setContentType("binary/octet-stream");
                 reqEntity.setChunked(true); // Send in multiple parts if needed
                 httppost.setEntity(reqEntity);
                 HttpResponse response = httpclient.execute(httppost);
                 jsonObject = new JSONObject(EntityUtils.toString(response.getEntity()));
                 //Do something with response..
-                System.out.println(jsonObject.toString()+ "lawda");
+                System.out.println(jsonObject+ "lawda");
 
 
             } catch (Exception e) {

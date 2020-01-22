@@ -14,10 +14,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
@@ -66,6 +68,7 @@ private HttpUtils httpUtils = new HttpUtils();
         file_name.setText("feature under development");
         download_button.setText("Feature Under Development");
         download_button.setTextColor(getResources().getColor(R.color.white));
+        download_button.setOnClickListener(this::onClick);
 
         ActionBar actionBar = getSupportActionBar();
         type = getIntent().getExtras().getString("type");
@@ -114,7 +117,6 @@ private HttpUtils httpUtils = new HttpUtils();
     }
     }
     private class DownloadTask extends AsyncTask<URL,Integer, File> {
-        public JSONObject jsonObject;
         private Context context;
         public CustomDialogFragment customDialogFragment;
         private File downloaded_file;
@@ -147,7 +149,7 @@ private HttpUtils httpUtils = new HttpUtils();
                 }
             }
             else {
-                downloaded_file = new File(context.getObbDir() , file_name);
+                downloaded_file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) , file_name);
             }
 
 
@@ -167,7 +169,7 @@ private HttpUtils httpUtils = new HttpUtils();
         protected void onPostExecute(File file) {
             if(type=="img")
             {
-                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),context.getObbDir().toString(),context);
+                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),context);
                 for(File mfile: fileArrayList){
                     Utils.addImageToGallery(mfile.getAbsolutePath(),context);
                 }
@@ -175,6 +177,9 @@ private HttpUtils httpUtils = new HttpUtils();
 
             }
                 customDialogFragment.dismiss();
+            Toast.makeText(context,"File saved to Downloads directory",Toast.LENGTH_SHORT);
+
+            ((DownloadFileActivity)context).finish();
 
         }
     }

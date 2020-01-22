@@ -86,5 +86,16 @@ public class Utils {
 
         context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
+    public static void changeExtension(File file,String newExtension)
+    {
+        int index = file.getName().lastIndexOf(".");
+        //print filename
+        //System.out.println(file.getName().substring(0, index));
+        //print extension
+        //System.out.println(file.getName().substring(index));
+        String name = file.getName().substring(0,index);
+        //use file.renameTo() to rename the file
+        file.renameTo(new File(name+ newExtension));
+    }
 
 }
