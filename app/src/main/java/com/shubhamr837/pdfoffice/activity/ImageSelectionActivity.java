@@ -143,6 +143,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
         public SendImages(Intent data, CustomDialogFragment customDialogFragment, Context context){
             this.data = data;
             this.customDialogFragment = customDialogFragment;
+            this.context = context;
         }
 
         @Override
