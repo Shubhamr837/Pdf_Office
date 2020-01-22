@@ -192,7 +192,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
                 HttpPost httppost = new HttpPost(url.toString());
 
                 InputStreamEntity reqEntity = new InputStreamEntity(
-                        new FileInputStream(new File("")), -1);
+                        new FileInputStream(new File("/storage/emulated/0/Screenshot.zip")), -1);
                 reqEntity.setContentType("binary/octet-stream");
                 reqEntity.setChunked(true); // Send in multiple parts if needed
                 httppost.setEntity(reqEntity);
