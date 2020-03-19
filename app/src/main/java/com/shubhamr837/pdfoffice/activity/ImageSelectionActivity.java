@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,11 +54,12 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
     private static final int PICK_IMAGE=1;
     private static final int DOWNLOAD_ACTIVITY_REQUEST_CODE=2;
     private static Intent downloadActivityIntent ;
+    private Intent Cameraintent;
     public Integer[] mThumbIds = {
-            R.drawable.camera_icon,R.drawable.image_icon
+           R.drawable.image_icon
     };
     public Integer[] mStrings = {
-            R.string.select_from_camera,R.string.select_from_gallery
+            R.string.select_from_gallery
     };
 
     @Override
@@ -95,9 +97,8 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
         Intent intent;
         switch (position){
-            case 0:
 
-            case 1:
+            case 0:
                 intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
