@@ -113,10 +113,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         gridview.setOnItemClickListener(this);
 
 
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user==null)
-            authenticate();
-
     }
 
     public void authenticate(){
