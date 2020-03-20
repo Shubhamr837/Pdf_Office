@@ -143,7 +143,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
             try {
 
                 if(convert_to=="DOCX") {
-                    url = new URL(CommonConstants.DOCX_CONVERSION_URL);
+                    url = new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
                     httpURLConnection = (HttpURLConnection)url.openConnection();
                 }
                 else if(convert_to=="TXT")
