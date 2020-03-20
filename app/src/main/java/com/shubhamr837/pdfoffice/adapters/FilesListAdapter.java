@@ -19,10 +19,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
-import com.shubhamr837.pdfoffice.MainActivity;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.activity.DownloadFileActivity;
 import com.shubhamr837.pdfoffice.activity.PdfReadActivity;
+import com.shubhamr837.pdfoffice.utils.CommonConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,12 +43,14 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
     public static String pdf_intent;
     public static Vector<File> files;
     public String type ;
+    public String to;
     private static CustomDialogFragment customDialogFragment;
     private static FragmentManager fragmentManager;
 
-   public FilesListAdapter(String pdf_intent, String type,FragmentManager fragmentManager){
+   public FilesListAdapter(String pdf_intent, String type,String to,FragmentManager fragmentManager){
        this.pdf_intent = pdf_intent;
        this.type=type;
+       this.to=to;
        this.fragmentManager=fragmentManager;
    }
 
@@ -61,16 +63,19 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
         // each data item is just a string in this case
         public View view;
         public String type;
-        public MyViewHolder(View v,String type) {
+        public String to;;
+        public MyViewHolder(View v,String type,String to) {
             super(v);
             v.setOnClickListener(this);
             view = v;
+            this.to=to;
             this.type=type;
         }
         public class DownloadTask extends AsyncTask<File,Integer, Intent> {
             public JSONObject jsonObject;
             private Context context;
             public CustomDialogFragment customDialogFragment;
+            private URL url;
 
 
             public DownloadTask(Context context,CustomDialogFragment customDialogFragment)
@@ -88,7 +93,16 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
 
                 ByteArrayOutputStream bos= new ByteArrayOutputStream();
                 try {
-                    URL url = new URL("https://www.google.com/");
+                    if(to=="docx")
+                     url= new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
+                    else if(to=="pdf"&&type=="docx"){
+                       url = new URL(CommonConstants.DOCX_TO_PDF_CONVERSION_URL);
+                    }
+                    else if(to=="img"&&type=="pdf")
+                    {
+                        url=new URL(CommonConstants.PDF_TO_IMG_CONVERSION_URL);
+                    }
+
                     HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.setRequestProperty("Content-Type","application/x-binary; utf-8");
@@ -125,7 +139,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
                 }
 
                 downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
-                downloadActivityIntent.putExtra("type","pdf");
+                downloadActivityIntent.putExtra("type",type);
                 if(jsonObject!=null)
                     try {
                         downloadActivityIntent.putExtra("download_link",jsonObject.getString("download-link"));
@@ -177,7 +191,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
         View v = (View) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.single_files_list_element, parent, false);
 
-        MyViewHolder vh = new MyViewHolder(v,type);
+        MyViewHolder vh = new MyViewHolder(v,type,to);
         return vh;
     }
 

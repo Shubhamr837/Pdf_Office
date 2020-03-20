@@ -20,8 +20,7 @@ import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Stack;
+
 import java.util.Vector;
 
 public class FilesSelection extends AppCompatActivity {
@@ -32,6 +31,7 @@ public class FilesSelection extends AppCompatActivity {
     public Vector<File> files;
     private Bundle bundle;
     public String type;
+    public String to;
     public String pdf_intent;
     public static CustomDialogFragment customDialogFragment = new CustomDialogFragment("Please wait","Scanning files...",false); ;
 
@@ -64,9 +64,10 @@ public class FilesSelection extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         type = bundle.getString("type");
+        to=bundle.getString("to");
 
 
-        mAdapter = new FilesListAdapter(pdf_intent,type,getSupportFragmentManager());
+        mAdapter = new FilesListAdapter(pdf_intent,type,to,getSupportFragmentManager());
         recyclerView.setAdapter(mAdapter);
         if( (MainActivity.getInstance().scan_files.isAlive()))
         {
