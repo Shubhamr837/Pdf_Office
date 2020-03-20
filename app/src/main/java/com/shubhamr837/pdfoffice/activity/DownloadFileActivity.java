@@ -22,13 +22,10 @@ import android.widget.Toast;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
-import com.shubhamr837.pdfoffice.utils.FirebaseUtils;
 import com.shubhamr837.pdfoffice.utils.HttpUtils;
 import com.shubhamr837.pdfoffice.utils.Packager;
 import com.shubhamr837.pdfoffice.utils.Utils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
