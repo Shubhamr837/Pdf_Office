@@ -49,15 +49,17 @@ private String download_link;
 private Button download_button;
 private ImageView file_icon;
 private URL url;
+private Intent calling_intent;
 private HttpUtils httpUtils = new HttpUtils();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        calling_intent = getIntent();
         setContentView(R.layout.activity_download_file);
         file_name=(TextView)findViewById(R.id.fileName);
         download_button=(Button)findViewById(R.id.download_button);
         file_icon = (ImageView)findViewById(R.id.fileIcon);
-        download_link = getIntent().getExtras().getString(CommonConstants.DOWNLOAD_LINK_KEY);
+        download_link = calling_intent.getExtras().getString(CommonConstants.DOWNLOAD_LINK_KEY);
 
 
         file_name.setText("feature under development");

@@ -143,6 +143,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
 
             ByteArrayOutputStream bos= new ByteArrayOutputStream();
             try {
+                customDialogFragment.show(getSupportFragmentManager(),"");
 
                 if(convert_to.equals("docx")) {
                     url = new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
@@ -183,6 +184,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                         inputStream = httpURLConnection.getInputStream();
                     } else {
                         inputStream = httpURLConnection.getErrorStream();
+                        finish();
                     }
 
                     buffer = new byte[1024];
@@ -195,20 +197,28 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
 
             } catch (Exception e) {
                 e.printStackTrace();
+                customDialogFragment.dismiss();
+                return null;
             }
-            customDialogFragment.dismiss();
+
             downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
             if(jsonObject!=null)
             try {
-                downloadActivityIntent.putExtra("download_link",jsonObject.getString("download_link"));
+                downloadActivityIntent.putExtra(CommonConstants.DOWNLOAD_LINK_KEY,jsonObject.getString("download_link"));
                 downloadActivityIntent.putExtra("file_name",pdf_file.getName());
                 downloadActivityIntent.putExtra("type", convert_to);
             } catch (JSONException e) {
                 e.printStackTrace();
+                return null;
+            }
+            else
+            {
+                return null;
             }
             return downloadActivityIntent;
         }
         protected void onPostExecute(Intent downloadActivityIntent) {
+            if(downloadActivityIntent==null) {finish(); return;}
             startActivity(downloadActivityIntent);
             customDialogFragment.dismiss();
 
@@ -231,7 +241,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 else if(to.equals("docx"))
                 {
-                    downloadTask = new DownloadTask(this,customDialogFragment,"docx");
+                    downloadTask = new DownloadTask(this,customDialogFragment,to);
                 }
                 else if(to.equals("img")){
                     downloadTask = new DownloadTask(this,customDialogFragment,to);
