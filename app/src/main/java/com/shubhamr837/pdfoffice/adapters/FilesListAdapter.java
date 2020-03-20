@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -60,7 +59,6 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
 
 
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        // each data item is just a string in this case
         public View view;
         public String type;
         public String to;;
@@ -165,6 +163,7 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
             {intent= new Intent(view.getContext(),PdfReadActivity.class);
             intent.putExtra("file_path",file_path);
             intent.putExtra("intent",pdf_intent);
+            intent.putExtra("convert_to",to);
             view.getContext().startActivity(intent);}
             else if (type.equals("docx")){
                 if(isNetworkConnected(view.getContext()))

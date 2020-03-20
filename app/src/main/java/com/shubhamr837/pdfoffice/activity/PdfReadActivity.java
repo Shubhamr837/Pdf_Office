@@ -50,6 +50,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
     private PDFView.Configurator configurator;
     private boolean nightModeState=false;
     private DownloadTask downloadTask;
+    private String to;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +61,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
         }
         else
             setContentView(R.layout.activity_pdf_read);
+        to=getIntent().getExtras().getString("convert_to");
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(pdf_intent);
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
@@ -137,20 +139,23 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
             Intent downloadActivityIntent;
             int bytesRead;
             URL url ;
-            HttpURLConnection httpURLConnection ;
+            HttpURLConnection httpURLConnection = null ;
 
             ByteArrayOutputStream bos= new ByteArrayOutputStream();
             try {
 
-                if(convert_to=="DOCX") {
+                if(convert_to.equals("docx")) {
                     url = new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
                     httpURLConnection = (HttpURLConnection)url.openConnection();
                 }
-                else if(convert_to=="TXT")
+                else if(convert_to.equals("txt"))
                 {
                     url = new URL(CommonConstants.TXT_CONVERSION_URL);
                     httpURLConnection = (HttpURLConnection)url.openConnection();
 
+                }
+                else if(convert_to.equals("img")){
+                    url= new URL(CommonConstants.PDF_TO_IMG_CONVERSION_URL);
                 }
                 else {
                     return null;
@@ -220,13 +225,16 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 customDialogFragment = new CustomDialogFragment("Converting File","Please wait...",true);
                 customDialogFragment.setCancelable(false);
                 customDialogFragment.show(getSupportFragmentManager(),"Convert File Fragment");
-                if(pdf_intent.endsWith("DOCX"))
+                if(to.equals("txt"))
                 {
-                    downloadTask = new DownloadTask(this,customDialogFragment,"DOCX");
+                    downloadTask = new DownloadTask(this,customDialogFragment,to);
                 }
-                else if(pdf_intent.endsWith("TXT"))
+                else if(to.equals("docx"))
                 {
-                    downloadTask = new DownloadTask(this,customDialogFragment,"TXT");
+                    downloadTask = new DownloadTask(this,customDialogFragment,"docx");
+                }
+                else if(to.equals("img")){
+                    downloadTask = new DownloadTask(this,customDialogFragment,to);
                 }
                 downloadTask.execute(pdf_file);
 
