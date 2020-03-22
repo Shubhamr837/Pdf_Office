@@ -7,8 +7,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -104,18 +102,25 @@ public class Packager
     public static ArrayList<File> unzip(String zipFilePath, String destDir, String ext , Context context) {
         ArrayList<File> fileList = new ArrayList<File>();
         FileInputStream fis;
+        System.out.println("Inside unzip");
         //buffer for read and write data to file
         byte[] buffer = new byte[1024];
         try {
             fis = new FileInputStream(zipFilePath);
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
+            if(ze==null){
+                System.out.println("Zip folder does not contain any files");
+            }
+            System.out.println("ZipinputStream Created");
             while (ze != null) {
                 String fileName = java.util.UUID.randomUUID().toString();
                 if(fileName.length()>30){
                     fileName.substring(0,30);
                 }
-                File newFile = new File(context.getObbDir(),fileName+"."+ext);
+                File newFile = new File(destDir,fileName+"."+ext);
+                System.out.println("file created " + newFile.getAbsolutePath());
+                newFile.createNewFile();
                 System.out.println("Unzipping to " + newFile.getAbsolutePath());
                 //create directories for sub directories in zip
                 FileOutputStream fos = new FileOutputStream(newFile);

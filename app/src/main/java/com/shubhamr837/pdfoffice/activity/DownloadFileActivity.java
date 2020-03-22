@@ -1,7 +1,9 @@
 package com.shubhamr837.pdfoffice.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -9,10 +11,9 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -28,16 +29,14 @@ import com.shubhamr837.pdfoffice.utils.Utils;
 
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.util.ArrayList;
 
 import static com.shubhamr837.pdfoffice.utils.Packager.unzip;
@@ -62,8 +61,8 @@ private HttpUtils httpUtils = new HttpUtils();
         download_link = calling_intent.getExtras().getString(CommonConstants.DOWNLOAD_LINK_KEY);
 
 
-        file_name.setText("feature under development");
-        download_button.setText("Feature Under Development");
+        file_name.setText("");
+        download_button.setText("Download");
         download_button.setTextColor(getResources().getColor(R.color.white));
         download_button.setOnClickListener(this::onClick);
 
@@ -100,6 +99,13 @@ private HttpUtils httpUtils = new HttpUtils();
 
     @Override
     public void onClick(View view) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            }
+            else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+        }
 
     switch (view.getId()){
 
@@ -117,12 +123,15 @@ private HttpUtils httpUtils = new HttpUtils();
         private Context context;
         public CustomDialogFragment customDialogFragment;
         private File downloaded_file;
+        private File download_folder;
 
 
         public DownloadTask(Context context,CustomDialogFragment customDialogFragment )
         {
             this.context=context;
             this.customDialogFragment=customDialogFragment;
+            download_folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/PdfReader");
+            download_folder.mkdirs();
 
         }
 
@@ -131,6 +140,7 @@ private HttpUtils httpUtils = new HttpUtils();
         protected File doInBackground(URL... urls) {
             URL url = urls[0] ;
             HttpURLConnection httpURLConnection ;
+            System.out.println("Download link"+url.toString());
             customDialogFragment.setCancelable(false);
             customDialogFragment.show(((DownloadFileActivity)context).getSupportFragmentManager(),"downloading_file");
             String file_name = java.util.UUID.randomUUID().toString();
@@ -138,43 +148,73 @@ private HttpUtils httpUtils = new HttpUtils();
                 file_name = file_name.substring(0 , 30);
             }
 
-            if(type=="img"){
+            if(type.equals("img")){
                 try {
-                    downloaded_file = File.createTempFile("temp","file");
+                    downloaded_file = File.createTempFile("temp","file.zip");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            else {
-                downloaded_file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) , file_name + ".pdf");
+            else if(type.equals("pdf")) {
+                try{
+                    downloaded_file = new File(download_folder,file_name + ".pdf");
+                    try{downloaded_file.createNewFile();}catch (Exception e){e.printStackTrace();}
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
             }
+            else if(type.equals("docx"))
+            {
+                try{
+                    downloaded_file = new File(download_folder,file_name+".docx");
+                    downloaded_file.createNewFile();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                } }
+            else if(type.equals("txt"))
+            {
+                downloaded_file=new File(download_folder,file_name+".txt");
+                try{downloaded_file.createNewFile();}catch (Exception e){e.printStackTrace();}
+                }
 
 
-            try (BufferedInputStream in = new BufferedInputStream(new URL(download_link).openStream());
-                 FileOutputStream fileOutputStream = new FileOutputStream(downloaded_file)) {
+            BufferedInputStream in = null;
+            try {
+                in = new BufferedInputStream(new URL(download_link).openStream());
+                FileOutputStream fileOutputStream = new FileOutputStream(downloaded_file);
                 byte dataBuffer[] = new byte[1024];
                 int bytesRead;
                 while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                     fileOutputStream.write(dataBuffer, 0, bytesRead);
                 }
+                in.close();
+                fileOutputStream.flush();
+                fileOutputStream.close();
             } catch (IOException e) {
                 // handle exception
             }
+            System.out.println(type);
+            System.out.println("File saved to " + downloaded_file.getAbsolutePath());
             return downloaded_file;
 
         }
         protected void onPostExecute(File file) {
-            if(type=="img")
+            if(type.equals("img"))
             {
-                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString(),"jpg",context);
+                ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),download_folder.getAbsolutePath(),"jpg",context);
                 for(File mfile: fileArrayList){
                     Utils.addImageToGallery(mfile.getAbsolutePath(),context);
                 }
                 downloaded_file.delete();
+                Toast.makeText(context,"File saved to "+download_folder.getAbsolutePath() +" directory",Toast.LENGTH_SHORT).show();
+                return;
+
 
             }
             customDialogFragment.dismiss();
-            Toast.makeText(context,"File saved to Downloads directory",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,"File saved to "+downloaded_file.getAbsolutePath() +" directory",Toast.LENGTH_SHORT).show();
 
             ((DownloadFileActivity)context).finish();
 

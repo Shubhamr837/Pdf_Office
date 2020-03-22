@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                   intent.putExtra("type","pdf");
                   intent.putExtra("to","docx");
                   intent.putExtra("tittle","select a file");
-                  intent.putExtra("intent","Convert_to_DOCX");
+                  intent.putExtra("intent","Convert_to_docx");
                   FilesListAdapter.files=pdf_files;
                   startActivity(intent);
                   break;
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("type","pdf");
                 intent.putExtra("to","txt");
                 intent.putExtra("tittle","select a file");
-                intent.putExtra("intent","Convert_to_TXT");
+                intent.putExtra("intent","Convert_to_txt");
                 FilesListAdapter.files=pdf_files;
                 startActivity(intent);
                 break;
@@ -188,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("type","pdf");
                 intent.putExtra("to","img");
                 intent.putExtra("tittle","select a file");
+                intent.putExtra("intent","Convert_to_img");
                 FilesListAdapter.files=pdf_files;
                 startActivity(intent);
                 break;

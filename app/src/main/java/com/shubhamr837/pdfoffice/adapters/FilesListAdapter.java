@@ -91,12 +91,12 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
 
                 ByteArrayOutputStream bos= new ByteArrayOutputStream();
                 try {
-                    if(to=="docx")
+                    if(to.equals("docx"))
                      url= new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
-                    else if(to=="pdf"&&type=="docx"){
+                    else if(to.equals("pdf")&&type.equals("docx")){
                        url = new URL(CommonConstants.DOCX_TO_PDF_CONVERSION_URL);
                     }
-                    else if(to=="img"&&type=="pdf")
+                    else if(to.equals("img")&&type.equals("pdf"))
                     {
                         url=new URL(CommonConstants.PDF_TO_IMG_CONVERSION_URL);
                     }
@@ -159,11 +159,10 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
             Intent intent;
             String file_path =FilesListAdapter.files.get(getAdapterPosition()).getAbsolutePath();
 
-            if(type.equals("pdf"))
+            if(type.equals("pdf")&&pdf_intent.equals("read"))
             {intent= new Intent(view.getContext(),PdfReadActivity.class);
             intent.putExtra("file_path",file_path);
             intent.putExtra("intent",pdf_intent);
-            intent.putExtra("convert_to",to);
             view.getContext().startActivity(intent);}
             else if (type.equals("docx")){
                 if(isNetworkConnected(view.getContext()))
@@ -178,6 +177,14 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
                 else
                     Toast.makeText(view.getContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
             }
+
+            else if(type.equals("pdf")&&pdf_intent.startsWith("Convert"))
+            {
+                intent= new Intent(view.getContext(),PdfReadActivity.class);
+                intent.putExtra("file_path",file_path);
+                intent.putExtra("intent",pdf_intent);
+                intent.putExtra("to",to);
+                view.getContext().startActivity(intent);}
             }
 
         }

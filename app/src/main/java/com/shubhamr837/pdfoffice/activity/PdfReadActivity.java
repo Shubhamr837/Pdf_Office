@@ -24,8 +24,6 @@ import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
-import com.shubhamr837.pdfoffice.utils.FirebaseUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,7 +59,8 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
         }
         else
             setContentView(R.layout.activity_pdf_read);
-        to=getIntent().getExtras().getString("convert_to");
+        if(getIntent().getExtras().containsKey("to"))
+        to=getIntent().getExtras().getString("to");
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(pdf_intent);
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
@@ -141,10 +140,8 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
             URL url ;
             HttpURLConnection httpURLConnection = null ;
 
-            ByteArrayOutputStream bos= new ByteArrayOutputStream();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
-                customDialogFragment.show(getSupportFragmentManager(),"");
-
                 if(convert_to.equals("docx")) {
                     url = new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
                     httpURLConnection = (HttpURLConnection)url.openConnection();
@@ -157,6 +154,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 else if(convert_to.equals("img")){
                     url= new URL(CommonConstants.PDF_TO_IMG_CONVERSION_URL);
+                    httpURLConnection = (HttpURLConnection)url.openConnection();
                 }
                 else {
                     return null;
@@ -165,7 +163,7 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/x-binary; utf-8");
-                    httpURLConnection.setRequestProperty("auth-token", FirebaseUtils.getToken());
+                    httpURLConnection.setRequestProperty("auth-token","");
                     httpURLConnection.connect();
                     OutputStream out = httpURLConnection.getOutputStream();
                     FileInputStream in = new FileInputStream(pdf_file);
@@ -192,7 +190,12 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                         bos.write(buffer, 0, bytesRead);
                     }
                     jsonObject = new JSONObject(new String(bos.toByteArray()));
+                    System.out.println("Response " + jsonObject.toString());
+                    inputStream.close();
 
+                }
+                else {
+                    return null;
                 }
 
             } catch (Exception e) {
@@ -209,10 +212,12 @@ public class PdfReadActivity extends AppCompatActivity implements View.OnClickLi
                 downloadActivityIntent.putExtra("type", convert_to);
             } catch (JSONException e) {
                 e.printStackTrace();
+                customDialogFragment.dismiss();
                 return null;
             }
             else
             {
+                customDialogFragment.dismiss();
                 return null;
             }
             return downloadActivityIntent;
