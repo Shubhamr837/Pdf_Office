@@ -2,7 +2,7 @@
 Pdf Office android application
 
 This repository contains the pdf office nadroid application . 
-The application uses firebase for authentication.
+The application uses firebase for authentication the authentication is currently disabled .
 
 To run the app as reader simply download the apk and install.
 To use the conversion feature configure the backend in kubernetes .
