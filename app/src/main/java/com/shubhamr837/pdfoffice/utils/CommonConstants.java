@@ -1,7 +1,7 @@
 package com.shubhamr837.pdfoffice.utils;
 
 public class CommonConstants {
-    public static final String SERVER_URL = "http://35.224.76.210";
+    public static final String SERVER_URL = "http://104.155.134.50:80";
     public static final String PDF_DOCX_CONVERSION_URL = SERVER_URL+"/pdftoword/pdf/docx";
     public static final String IMG_TO_PDF_CONVERSION_URL = SERVER_URL+"/pdftoword/images/pdf";
     public static final String TXT_CONVERSION_URL = SERVER_URL+"/pdftoword/pdf/txt";

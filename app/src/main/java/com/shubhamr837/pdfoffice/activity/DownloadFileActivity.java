@@ -209,6 +209,7 @@ private HttpUtils httpUtils = new HttpUtils();
                 }
                 downloaded_file.delete();
                 Toast.makeText(context,"File saved to "+download_folder.getAbsolutePath() +" directory",Toast.LENGTH_SHORT).show();
+                customDialogFragment.dismiss();
                 return;
 
 
