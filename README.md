@@ -12,7 +12,9 @@ https://github.com/Shubhamr837/Pdf-Office-Eureka-Server .
 https://github.com/Shubhamr837/Pdf-Office-Zuul-Proxy .
 
 Clone the repo and build the application after going through following steps .
+
 The installation can be done going through the readme of each repository .
+
 Set the service ip address obtained after the installation of zuul proxy in com.shubhamr837.pdfoffice.utils.CommonConstants 
 as Server_url variable .
 
