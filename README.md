@@ -1,6 +1,11 @@
 # Pdf_Office
 Pdf Office android application
 
+Prior knowledge of following are needed to run the application .
+1 . kubernetes 
+2 . GCP or aws 
+3 . continou integration 
+
 This repository contains the pdf office android application . 
 The application uses firebase for authentication the authentication is currently disabled .
 
