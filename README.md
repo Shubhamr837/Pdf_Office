@@ -1,7 +1,16 @@
 # Pdf_Office
 Pdf Office open source android application
 
+This repository contains the pdf office android application . 
+The application uses firebase for authentication (the authentication feature is currently not enabled and is under development )
+
+
 Reader can be used simply by installing .
+
+To run the app as reader simply download the apk and install.
+
+
+To use the conversion feature configure the backend in kubernetes .
 
 Prior knowledge of following are needed to run the application if you want to use other backend server features .
 
@@ -11,11 +20,7 @@ Prior knowledge of following are needed to run the application if you want to us
 
 3 . continous integration ( cloud build ).
 
-This repository contains the pdf office android application . 
-The application uses firebase for authentication (the authentication feature is currently not enabled and is under development )
 
-To run the app as reader simply download the apk and install.
-To use the conversion feature configure the backend in kubernetes .
 The backend repositories are :-
 
 https://github.com/Shubhamr837/Pdf-to-Word-Server .
