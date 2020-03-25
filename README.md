@@ -17,9 +17,13 @@ The application uses firebase for authentication (the authentication feature is 
 To run the app as reader simply download the apk and install.
 To use the conversion feature configure the backend in kubernetes .
 The backend repositories are :-
+
 https://github.com/Shubhamr837/Pdf-to-Word-Server .
+
 https://github.com/Shubhamr837/Pdf-Office-Eureka-Server .
+
 https://github.com/Shubhamr837/Pdf-Office-Zuul-Proxy .
+
 
 Clone the repo and build the application after going through following steps .
 
