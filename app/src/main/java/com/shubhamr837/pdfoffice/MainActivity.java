@@ -13,16 +13,12 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
@@ -30,7 +26,8 @@ import com.shubhamr837.pdfoffice.activity.ImageSelectionActivity;
 import com.shubhamr837.pdfoffice.activity.FilesSelection;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
 import com.shubhamr837.pdfoffice.adapters.GridAdapter;
-import com.shubhamr837.pdfoffice.activity.EmailPasswordActivity;
+import com.shubhamr837.pdfoffice.utils.FileAction;
+import com.shubhamr837.pdfoffice.utils.FileType;
 import com.shubhamr837.pdfoffice.utils.ScanFiles;
 import java.io.File;
 import java.lang.reflect.Type;
@@ -39,7 +36,6 @@ import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener , AdapterView.OnItemClickListener
 {
-    private FirebaseUser user ;
     private static final int AUTHENTICATION_REQUEST_CODE = 1;
     private static final int MY_PERMISSIONS_REQUEST_READ_WRITE_FILES=1;
     public static final String pdf_files_list = "PDF_FILES_LIST";
@@ -114,11 +110,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     }
-
-    public void authenticate(){
-        Intent authentication_intent = new Intent(this,EmailPasswordActivity.class);
-        startActivityForResult(authentication_intent,AUTHENTICATION_REQUEST_CODE);
-    }
+//
+//    public void authenticate(){
+//        Intent authentication_intent = new Intent(this,EmailPasswordActivity.class);
+//        startActivityForResult(authentication_intent,AUTHENTICATION_REQUEST_CODE);
+//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -151,9 +147,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(id==R.id.pdf_reader)
          {
           Intent pdf_files_intent = new Intent(this, FilesSelection.class);
-          pdf_files_intent.putExtra("type","pdf");
-          pdf_files_intent.putExtra("tittle","Open a file");
-          pdf_files_intent.putExtra("intent","read");
+          pdf_files_intent.putExtra("type",FileType.PDF);
+          pdf_files_intent.putExtra("title","Open a file");
+          pdf_files_intent.putExtra("action",FileAction.READ);
           FilesListAdapter.files=pdf_files;
           startActivity(pdf_files_intent);
          }
@@ -166,29 +162,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (position){
             case 0:
                   intent = new Intent(this, FilesSelection.class);
-                  intent.putExtra("type","pdf");
-                  intent.putExtra("to","docx");
-                  intent.putExtra("tittle","select a file");
-                  intent.putExtra("intent","Convert_to_docx");
+                  intent.putExtra("type",FileType.PDF);
+                  intent.putExtra("to",FileType.DOCX);
+                  intent.putExtra("title","select a file");
+                  intent.putExtra("action", FileAction.CONVERT);
                   FilesListAdapter.files=pdf_files;
                   startActivity(intent);
                   break;
 
 
             case 1:intent = new Intent(this, FilesSelection.class);
-                intent.putExtra("type","pdf");
-                intent.putExtra("to","txt");
-                intent.putExtra("tittle","select a file");
-                intent.putExtra("intent","Convert_to_txt");
+                intent.putExtra("type", FileType.PDF);
+                intent.putExtra("to",FileType.TXT);
+                intent.putExtra("title","select a file");
+                intent.putExtra("action",FileAction.CONVERT);
                 FilesListAdapter.files=pdf_files;
                 startActivity(intent);
                 break;
 
             case 2:intent = new Intent(this, FilesSelection.class);
-                intent.putExtra("type","pdf");
-                intent.putExtra("to","img");
-                intent.putExtra("tittle","select a file");
-                intent.putExtra("intent","Convert_to_img");
+                intent.putExtra("type",FileType.PDF);
+                intent.putExtra("to",FileType.IMAGE);
+                intent.putExtra("title","select a file");
+                intent.putExtra("action",FileAction.CONVERT);
                 FilesListAdapter.files=pdf_files;
                 startActivity(intent);
                 break;
@@ -203,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+                                           String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_WRITE_FILES: {
 

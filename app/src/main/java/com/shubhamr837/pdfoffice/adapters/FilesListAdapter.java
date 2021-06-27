@@ -22,6 +22,8 @@ import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.activity.DownloadFileActivity;
 import com.shubhamr837.pdfoffice.activity.PdfReadActivity;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
+import com.shubhamr837.pdfoffice.utils.FileAction;
+import com.shubhamr837.pdfoffice.utils.FileType;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,49 +39,47 @@ import java.util.Vector;
 
 import static com.shubhamr837.pdfoffice.utils.Utils.isNetworkConnected;
 
-public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyViewHolder>  {
+public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyViewHolder> {
     private int FILE_NAME_LENGTH = 50;
-    public static String pdf_intent;
+    public static FileAction action;
     public static Vector<File> files;
-    public String type ;
-    public String to;
+    public FileType type;
+    public FileType to;
     private static CustomDialogFragment customDialogFragment;
     private static FragmentManager fragmentManager;
 
-   public FilesListAdapter(String pdf_intent, String type,String to,FragmentManager fragmentManager){
-       this.pdf_intent = pdf_intent;
-       this.type=type;
-       this.to=to;
-       this.fragmentManager=fragmentManager;
-   }
-
-
-
-
+    public FilesListAdapter(FileAction action, FileType type, FileType to, FragmentManager fragmentManager) {
+        this.action = action;
+        this.type = type;
+        this.to = to;
+        this.fragmentManager = fragmentManager;
+    }
 
 
     public static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View view;
-        public String type;
-        public String to;;
-        public MyViewHolder(View v,String type,String to) {
+        public FileType type;
+        public FileType to;
+        ;
+
+        public MyViewHolder(View v, FileType type, FileType to) {
             super(v);
             v.setOnClickListener(this);
             view = v;
-            this.to=to;
-            this.type=type;
+            this.to = to;
+            this.type = type;
         }
-        public class DownloadTask extends AsyncTask<File,Integer, Intent> {
+
+        public class ConvertTask extends AsyncTask<File, Integer, Intent> {
             public JSONObject jsonObject;
             private Context context;
             public CustomDialogFragment customDialogFragment;
             private URL url;
 
 
-            public DownloadTask(Context context,CustomDialogFragment customDialogFragment)
-            {
-                this.context=context;
-                this.customDialogFragment=customDialogFragment;
+            public ConvertTask(Context context, CustomDialogFragment customDialogFragment) {
+                this.context = context;
+                this.customDialogFragment = customDialogFragment;
             }
 
 
@@ -89,21 +89,18 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
                 Intent downloadActivityIntent;
                 int bytesRead;
 
-                ByteArrayOutputStream bos= new ByteArrayOutputStream();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 try {
-                    if(to.equals("docx"))
-                     url= new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
-                    else if(to.equals("pdf")&&type.equals("docx")){
-                       url = new URL(CommonConstants.DOCX_TO_PDF_CONVERSION_URL);
+                    if (to == FileType.DOCX && type == FileType.PDF) {
+                        url = new URL(CommonConstants.PDF_DOCX_CONVERSION_URL);
+                    } else if (to == FileType.PDF && type == FileType.DOCX) {
+                        url = new URL(CommonConstants.DOCX_TO_PDF_CONVERSION_URL);
+                    } else if (to == FileType.IMAGE && type == FileType.PDF) {
+                        url = new URL(CommonConstants.PDF_TO_IMG_CONVERSION_URL);
                     }
-                    else if(to.equals("img")&&type.equals("pdf"))
-                    {
-                        url=new URL(CommonConstants.PDF_TO_IMG_CONVERSION_URL);
-                    }
-
-                    HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                     httpURLConnection.setDoOutput(true);
-                    httpURLConnection.setRequestProperty("Content-Type","application/x-binary; utf-8");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/x-binary; utf-8");
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.connect();
                     OutputStream out = httpURLConnection.getOutputStream();
@@ -137,16 +134,17 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
                 }
 
                 downloadActivityIntent = new Intent(context, DownloadFileActivity.class);
-                downloadActivityIntent.putExtra("type",type);
-                if(jsonObject!=null)
+                downloadActivityIntent.putExtra("type", type);
+                if (jsonObject != null)
                     try {
-                        downloadActivityIntent.putExtra("download_link",jsonObject.getString("download-link"));
-                        downloadActivityIntent.putExtra("file_name",jsonObject.getString("file_name"));
+                        downloadActivityIntent.putExtra("download_link", jsonObject.getString("download-link"));
+                        downloadActivityIntent.putExtra("file_name", jsonObject.getString("file_name"));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 return downloadActivityIntent;
             }
+
             protected void onPostExecute(Intent downloadActivityIntent) {
                 context.startActivity(downloadActivityIntent);
                 customDialogFragment.dismiss();
@@ -157,37 +155,39 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
         @Override
         public void onClick(View view) {
             Intent intent;
-            String file_path =FilesListAdapter.files.get(getAdapterPosition()).getAbsolutePath();
+            String file_path = FilesListAdapter.files.get(getAdapterPosition()).getAbsolutePath();
 
-            if(type.equals("pdf")&&pdf_intent.equals("read"))
-            {intent= new Intent(view.getContext(),PdfReadActivity.class);
-            intent.putExtra("file_path",file_path);
-            intent.putExtra("intent",pdf_intent);
-            view.getContext().startActivity(intent);}
-            else if (type.equals("docx")){
-                if(isNetworkConnected(view.getContext()))
-                {
-                    customDialogFragment = new CustomDialogFragment("Converting File","Please wait...",true);
+            if (type == FileType.PDF && action == FileAction.READ) {
+                intent = new Intent(view.getContext(), PdfReadActivity.class);
+                intent.putExtra("file_path", file_path);
+                intent.putExtra("action", action);
+                view.getContext().startActivity(intent);
+            } else if (type == FileType.DOCX) {
+                if (isNetworkConnected(view.getContext())) {
+                    if(CommonConstants.SERVER_URL.equals(""))
+                    {
+                        Toast.makeText(view.getContext(), "Server is not configured", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    customDialogFragment = new CustomDialogFragment("Converting File", "Please wait...", true);
                     customDialogFragment.setCancelable(false);
-                    customDialogFragment.show(fragmentManager,"Convert File Fragment");
-                    DownloadTask downloadTask = new DownloadTask(view.getContext(),customDialogFragment);
-                    downloadTask.execute(new File(file_path));
+                    customDialogFragment.show(fragmentManager, "Convert File Fragment");
+                    ConvertTask convertTask = new ConvertTask(view.getContext(), customDialogFragment);
+                    convertTask.execute(new File(file_path));
 
+                } else {
+                    Toast.makeText(view.getContext(), "No Internet Connection", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(view.getContext(),"No Internet Connection",Toast.LENGTH_SHORT).show();
+            } else if (type == FileType.PDF && action == FileAction.CONVERT) {
+                intent = new Intent(view.getContext(), PdfReadActivity.class);
+                intent.putExtra("file_path", file_path);
+                intent.putExtra("action", action);
+                intent.putExtra("to", to);
+                view.getContext().startActivity(intent);
             }
-
-            else if(type.equals("pdf")&&pdf_intent.startsWith("Convert"))
-            {
-                intent= new Intent(view.getContext(),PdfReadActivity.class);
-                intent.putExtra("file_path",file_path);
-                intent.putExtra("intent",pdf_intent);
-                intent.putExtra("to",to);
-                view.getContext().startActivity(intent);}
-            }
-
         }
+
+    }
 
 
     @NonNull
@@ -197,30 +197,27 @@ public class FilesListAdapter extends RecyclerView.Adapter<FilesListAdapter.MyVi
         View v = (View) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.single_files_list_element, parent, false);
 
-        MyViewHolder vh = new MyViewHolder(v,type,to);
+        MyViewHolder vh = new MyViewHolder(v, type, to);
         return vh;
     }
-
 
 
     @Override
     public void onBindViewHolder(@NonNull FilesListAdapter.MyViewHolder holder, int position) {
         TextView textView = (TextView) holder.view.findViewById(R.id.file_name);
         String file_name = files.get(position).getName();
-        String type = holder.type;
-        if (file_name.length() > FILE_NAME_LENGTH)
-        {
-            textView.setText(file_name.substring(0, FILE_NAME_LENGTH) + "...");
-             }
-        else
-        {textView.setText(file_name);}
+        if (file_name.length() > FILE_NAME_LENGTH) {
+            textView.setText(String.format("%s...", file_name.substring(0, FILE_NAME_LENGTH)));
+        } else {
+            textView.setText(file_name);
+        }
         ImageView imageView = (ImageView) holder.view.findViewById(R.id.file_icon);
-       if(file_name.endsWith(".pdf"))
-                imageView.setImageResource(R.drawable.pdf_icon);
-       else if(file_name.endsWith(".docx")||file_name.endsWith(".DOCX"))
+        if (file_name.endsWith(".pdf"))
+            imageView.setImageResource(R.drawable.pdf_icon);
+        else if (file_name.endsWith(".docx") || file_name.endsWith(".DOCX"))
             imageView.setImageResource(R.drawable.doc_icon);
-       else if(file_name.endsWith(".txt"))
-                imageView.setImageResource(R.drawable.txt_icon);
+        else if (file_name.endsWith(".txt"))
+            imageView.setImageResource(R.drawable.txt_icon);
 
     }
 

@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.utils.CommonConstants;
+import com.shubhamr837.pdfoffice.utils.FileType;
 import com.shubhamr837.pdfoffice.utils.HttpUtils;
 import com.shubhamr837.pdfoffice.utils.Packager;
 import com.shubhamr837.pdfoffice.utils.Utils;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
 import static com.shubhamr837.pdfoffice.utils.Packager.unzip;
 
 public class DownloadFileActivity extends AppCompatActivity implements View.OnClickListener {
-public String type;
+public FileType type;
 private TextView file_name;
 private String download_link;
 private Button download_button;
@@ -67,8 +68,8 @@ private HttpUtils httpUtils = new HttpUtils();
         download_button.setOnClickListener(this::onClick);
 
         ActionBar actionBar = getSupportActionBar();
-        type = getIntent().getExtras().getString("type");
-        actionBar.setTitle("Download "+ type);
+        type = (FileType) getIntent().getExtras().get("type");
+        actionBar.setTitle("Download "+ type.toString());
 
         actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -81,17 +82,17 @@ private HttpUtils httpUtils = new HttpUtils();
 
         switch (type)
         {
-            case "pdf": file_icon.setImageResource(R.drawable.pdf_icon);
+            case PDF: file_icon.setImageResource(R.drawable.pdf_icon);
 
             break;
 
-            case "docx": file_icon.setImageResource(R.drawable.doc_icon);
+            case DOCX: file_icon.setImageResource(R.drawable.doc_icon);
 
             break;
-            case "txt": file_icon.setImageResource(R.drawable.txt_icon);
+            case TXT: file_icon.setImageResource(R.drawable.txt_icon);
 
             break;
-            case "img": file_icon.setImageResource(R.drawable.image_icon);
+            case IMAGE: file_icon.setImageResource(R.drawable.image_icon);
 
             break;
         }
@@ -148,36 +149,43 @@ private HttpUtils httpUtils = new HttpUtils();
                 file_name = file_name.substring(0 , 30);
             }
 
-            if(type.equals("img")){
-                try {
-                    downloaded_file = File.createTempFile("temp","file.zip");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            switch (type) {
+                case IMAGE:
+                    try {
+                        downloaded_file = File.createTempFile("temp", "file.zip");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case PDF:
+                    try {
+                        downloaded_file = new File(download_folder, file_name + ".pdf");
+                        try {
+                            downloaded_file.createNewFile();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case DOCX:
+                    try {
+                        downloaded_file = new File(download_folder, file_name + ".docx");
+                        downloaded_file.createNewFile();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case TXT:
+                    downloaded_file = new File(download_folder, file_name + ".txt");
+                    try {
+                        downloaded_file.createNewFile();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
-            else if(type.equals("pdf")) {
-                try{
-                    downloaded_file = new File(download_folder,file_name + ".pdf");
-                    try{downloaded_file.createNewFile();}catch (Exception e){e.printStackTrace();}
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-            else if(type.equals("docx"))
-            {
-                try{
-                    downloaded_file = new File(download_folder,file_name+".docx");
-                    downloaded_file.createNewFile();
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                } }
-            else if(type.equals("txt"))
-            {
-                downloaded_file=new File(download_folder,file_name+".txt");
-                try{downloaded_file.createNewFile();}catch (Exception e){e.printStackTrace();}
-                }
 
 
             BufferedInputStream in = null;
@@ -201,7 +209,7 @@ private HttpUtils httpUtils = new HttpUtils();
 
         }
         protected void onPostExecute(File file) {
-            if(type.equals("img"))
+            if(type==FileType.IMAGE)
             {
                 ArrayList<File> fileArrayList = Packager.unzip(downloaded_file.getAbsolutePath(),download_folder.getAbsolutePath(),"jpg",context);
                 for(File mfile: fileArrayList){

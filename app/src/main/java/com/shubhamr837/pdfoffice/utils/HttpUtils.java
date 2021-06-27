@@ -58,12 +58,6 @@ public class HttpUtils {
     }
     public void downloadFile(URL url,String type){
 
-
-        idToken = FirebaseUtils.getToken();
-        if(idToken==null){
-            return;
-        }
-
         GetJSONRequestAsyncTasks getJSONRequestAsyncTasks = new GetJSONRequestAsyncTasks();
         getJSONRequestAsyncTasks.execute(url);
 

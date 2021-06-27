@@ -18,6 +18,8 @@ import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.MainActivity;
 import com.shubhamr837.pdfoffice.R;
 import com.shubhamr837.pdfoffice.adapters.FilesListAdapter;
+import com.shubhamr837.pdfoffice.utils.FileAction;
+import com.shubhamr837.pdfoffice.utils.FileType;
 
 import java.io.File;
 
@@ -30,25 +32,25 @@ public class FilesSelection extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     public Vector<File> files;
     private Bundle bundle;
-    public String type;
-    public String to;
-    public String pdf_intent;
-    public static CustomDialogFragment customDialogFragment = new CustomDialogFragment("Please wait","Scanning files...",false); ;
+    public FileType type;
+    public FileType to;
+    public FileAction action;
+    public static CustomDialogFragment customDialogFragment = new CustomDialogFragment("Please wait", "Scanning files...", false);
+    ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         bundle = getIntent().getExtras();
-        if(bundle.containsKey("intent"))
-            pdf_intent = bundle.getString("intent");
+        action = (FileAction) bundle.get("action");
 
         setContentView(R.layout.files_list_view);
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar!=null)
-        { actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(bundle.getString("tittle"));
+        if (actionBar != null) {
+            actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.red)));
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(bundle.getString("title"));
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().setStatusBarColor(getResources().getColor(R.color.red, this.getTheme()));
@@ -63,20 +65,20 @@ public class FilesSelection extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        type = bundle.getString("type");
-        to=bundle.getString("to");
+        type = (FileType) bundle.get("type");
+        to = (FileType) bundle.get("to");
 
 
-        mAdapter = new FilesListAdapter(pdf_intent,type,to,getSupportFragmentManager());
+        mAdapter = new FilesListAdapter(action, type, to, getSupportFragmentManager());
         recyclerView.setAdapter(mAdapter);
-        if( (MainActivity.getInstance().scan_files.isAlive()))
-        {
+        if ((MainActivity.getInstance().scan_files.isAlive())) {
             customDialogFragment.setCancelable(false);
-            customDialogFragment.show(getSupportFragmentManager(),"scan_files");
+            customDialogFragment.show(getSupportFragmentManager(), "scan_files");
         }
 
 
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -89,6 +91,6 @@ public class FilesSelection extends AppCompatActivity {
     }
 
 
-    }
+}
 
 

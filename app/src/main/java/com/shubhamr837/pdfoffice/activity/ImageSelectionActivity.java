@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.shubhamr837.pdfoffice.Fragments.CustomDialogFragment;
 import com.shubhamr837.pdfoffice.R;
@@ -50,13 +51,13 @@ import java.net.URL;
 import java.util.ArrayList;
 
 
-public class ImageSelectionActivity extends AppCompatActivity implements  AdapterView.OnItemClickListener{
-    private static final int PICK_IMAGE=1;
-    private static final int DOWNLOAD_ACTIVITY_REQUEST_CODE=2;
-    private static Intent downloadActivityIntent ;
+public class ImageSelectionActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private static final int PICK_IMAGE = 1;
+    private static final int DOWNLOAD_ACTIVITY_REQUEST_CODE = 2;
+    private static Intent downloadActivityIntent;
     private Intent Cameraintent;
     public Integer[] mThumbIds = {
-           R.drawable.image_icon
+            R.drawable.image_icon
     };
     public Integer[] mStrings = {
             R.string.select_from_gallery
@@ -79,9 +80,10 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
             getWindow().setStatusBarColor(getResources().getColor(R.color.red));
         }
 
-        gridview.setAdapter(new GridAdapter(this,mThumbIds,mStrings));
+        gridview.setAdapter(new GridAdapter(this, mThumbIds, mStrings));
         gridview.setOnItemClickListener(this);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -96,48 +98,53 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
         Intent intent;
-        switch (position){
+        switch (position) {
 
             case 0:
+                Toast.makeText(this, "Hold to select multiple images", Toast.LENGTH_SHORT).show();
                 intent = new Intent();
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent,"Select Picture"), PICK_IMAGE);
-
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                break;
 
         }
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        File zip_file = new File(getObbDir()+"/temp_zip.zip");
+        File zip_file = new File(getObbDir() + "/temp_zip.zip");
         Uri imagePath;
         CustomDialogFragment customDialogFragment;
-        if(requestCode == PICK_IMAGE) {
-            if(resultCode == Activity.RESULT_OK) {
-                if(data.getClipData() != null) {
-                    customDialogFragment = new CustomDialogFragment("Converting Files","Please wait...",true);
+        if (requestCode == PICK_IMAGE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data.getClipData() != null) {
+                    if (CommonConstants.SERVER_URL.equals("")) {
+                        Toast.makeText(this, "Server is not configured", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    customDialogFragment = new CustomDialogFragment("Converting Files", "Please wait...", true);
                     customDialogFragment.setCancelable(false);
-                    customDialogFragment.show(getSupportFragmentManager(),"Convert File Fragment");
-                    SendImages sendImages = new SendImages(data,customDialogFragment,this);
+                    customDialogFragment.show(getSupportFragmentManager(), "Convert File Fragment");
+                    SendImages sendImages = new SendImages(data, customDialogFragment, this);
                     sendImages.execute(zip_file);
                 }
-            } else if(data.getData() != null) {
+            } else if (data.getData() != null) {
                 imagePath = data.getData();
                 //do something with the image (save it to some directory or whatever you need to do with it here)
             }
-        }
-        else if (requestCode == DOWNLOAD_ACTIVITY_REQUEST_CODE )
-        {
+        } else if (requestCode == DOWNLOAD_ACTIVITY_REQUEST_CODE) {
             finish();
         }
     }
-    private class SendImages extends AsyncTask<File , Integer , Intent>{
+
+    private class SendImages extends AsyncTask<File, Integer, Intent> {
 
         Uri imagePath;
-        ArrayList<File> files= new ArrayList<>();
+        ArrayList<File> files = new ArrayList<>();
         File image_file;
         CustomDialogFragment customDialogFragment;
         Intent data;
@@ -145,8 +152,7 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
         Context context;
 
 
-
-        public SendImages(Intent data, CustomDialogFragment customDialogFragment, Context context){
+        public SendImages(Intent data, CustomDialogFragment customDialogFragment, Context context) {
             this.data = data;
             this.customDialogFragment = customDialogFragment;
             this.context = context;
@@ -159,15 +165,15 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
 
             int bytesRead;
 
-            ByteArrayOutputStream bos= new ByteArrayOutputStream();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
             int count = data.getClipData().getItemCount();
-            System.out.println("data is "+ count);//evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
-            for(int i = 0; i < count; i++)
-            { imagePath = data.getClipData().getItemAt(i).getUri();
+            System.out.println("data is " + count);//evaluate the count before the for loop --- otherwise, the count is evaluated every loop.
+            for (int i = 0; i < count; i++) {
+                imagePath = data.getClipData().getItemAt(i).getUri();
                 final InputStream in;
                 try {
-                    image_file = new File(getObbDir(),"image_"+i+".png");
+                    image_file = new File(getObbDir(), "image_" + i + ".png");
                     FileOutputStream out = new FileOutputStream(image_file);
                     in = getContentResolver().openInputStream(imagePath);
                     byte[] buffer = new byte[1024];
@@ -185,12 +191,12 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
                 }
             }
             try {
-                Packager.packZip(zip_file,files);
+                Packager.packZip(zip_file, files);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            Log.i("Temp Zip File created",zip_file.getAbsolutePath());
+            Log.i("Temp Zip File created", zip_file.getAbsolutePath());
 
             try {
                 URL url = new URL(CommonConstants.IMG_TO_PDF_CONVERSION_URL);
@@ -214,12 +220,11 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
             }
 
 
-
-            if(jsonObject!=null)
+            if (jsonObject != null)
                 try {
-                    downloadActivityIntent.putExtra(CommonConstants.DOWNLOAD_LINK_KEY,jsonObject.getString("download_link"));
-                    downloadActivityIntent.putExtra("file_name","Images");
-                    downloadActivityIntent.putExtra("type","pdf");
+                    downloadActivityIntent.putExtra(CommonConstants.DOWNLOAD_LINK_KEY, jsonObject.getString("download_link"));
+                    downloadActivityIntent.putExtra("file_name", "Images");
+                    downloadActivityIntent.putExtra("type", "pdf");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -227,8 +232,8 @@ public class ImageSelectionActivity extends AppCompatActivity implements  Adapte
         }
 
         protected void onPostExecute(Intent downloadActivityIntent) {
-            if(downloadActivityIntent!=null){
-                ((ImageSelectionActivity)context).startActivityForResult(downloadActivityIntent,DOWNLOAD_ACTIVITY_REQUEST_CODE);
+            if (downloadActivityIntent != null) {
+                ((ImageSelectionActivity) context).startActivityForResult(downloadActivityIntent, DOWNLOAD_ACTIVITY_REQUEST_CODE);
                 customDialogFragment.dismiss();
             }
         }

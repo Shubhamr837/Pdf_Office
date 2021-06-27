@@ -18,13 +18,13 @@ import org.w3c.dom.Text;
 public class CustomDialogFragment extends androidx.fragment.app.DialogFragment {
 
     public String dialog_text;
-    public String dialog_tittle;
+    public String dialog_title;
     public boolean dialog_button;
 
-    public CustomDialogFragment(String dialog_tittle,String dialog_text,boolean dialog_button){
+    public CustomDialogFragment(String dialog_title,String dialog_text,boolean dialog_button){
         super();
         this.dialog_button=dialog_button;
-        this.dialog_tittle=dialog_tittle;
+        this.dialog_title=dialog_title;
         this.dialog_text=dialog_text;
 
     }
@@ -36,7 +36,7 @@ public class CustomDialogFragment extends androidx.fragment.app.DialogFragment {
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
     }
-        ((TextView)view.findViewById(R.id.dialog_tittle)).setText(dialog_tittle);
+        ((TextView)view.findViewById(R.id.dialog_title)).setText(dialog_title);
         ((TextView)view.findViewById(R.id.dialog_text)).setText(dialog_text);
         if(dialog_button)
             ((TextView)view.findViewById(R.id.cancel_action_button)).setVisibility(View.VISIBLE);
